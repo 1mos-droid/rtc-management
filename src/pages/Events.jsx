@@ -138,7 +138,7 @@ const Events = () => {
   return (
     <Box sx={{ pb: 6 }}>
       {/* Header */}
-      <Stack direction={{ xs: 'column', md: 'row' }} sx={{ justifyContent: "space-between" }} spacing={3} sx={{ alignItems: "flex-end", mb: { xs: 4, md: 6 } }}>
+      <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} sx={{ justifyContent: "space-between", alignItems: "flex-end", mb: { xs: 4, md: 6 } }}>
         <Box>
           <Typography variant="overline" color="primary" fontWeight={800} letterSpacing={3}>CHURCH AGENDA</Typography>
           <Typography variant="h2" sx={{ fontWeight: 900, mt: 1, fontSize: { xs: '2rem', md: '3rem' } }}>Calendar of Service</Typography>
