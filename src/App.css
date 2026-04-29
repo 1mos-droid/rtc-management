@@ -1,0 +1,21 @@
+/* RTC Masterpiece Styles */
+
+.serif {
+  font-family: 'Merriweather', serif;
+}
+
+.lora {
+  font-family: 'Lora', serif;
+}
+
+.minimal-card {
+  border: 1px solid rgba(44, 94, 80, 0.1);
+  background: #ffffff;
+  padding: 2rem;
+}
+
+/* Typography refinements */
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0;
+  color: #2C5E50;
+}

@@ -1,0 +1,22 @@
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import App from './App.jsx';
+import ErrorBoundary from './components/ErrorBoundary';
+import { WorkspaceProvider } from './context/WorkspaceProvider';
+import { AuthProvider } from './context/AuthProvider';
+import './index.css';
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <AuthProvider>
+          <WorkspaceProvider>
+            <App />
+          </WorkspaceProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
+  </React.StrictMode>,
+);
