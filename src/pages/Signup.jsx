@@ -23,14 +23,14 @@ import { sanitize, containsMaliciousPattern } from '../utils/sanitizer';
 const Signup = () => {
   const theme = useTheme();
   const navigate = useNavigate();
-  const { refreshUserContext } = useWorkspace();
+  const { refreshUserContext, showNotification } = useWorkspace();
   const { signup, isAuthenticated } = useAuth();
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && !signupSuccess) {
       navigate('/');
     }
-  }, [navigate, isAuthenticated]);
+  }, [navigate, isAuthenticated, signupSuccess]);
 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -71,8 +71,11 @@ const Signup = () => {
       const result = await signup(sanitizedEmail, formData.password, sanitizedName, sanitizedDept);
       
       if (result?.session) {
-        refreshUserContext();
-        navigate('/');
+        showNotification('Welcome! Please check your email for a confirmation link.', 'success');
+        setTimeout(() => {
+          refreshUserContext();
+          navigate('/');
+        }, 3000);
       } else {
         setSignupSuccess(true);
       }
