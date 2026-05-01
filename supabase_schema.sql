@@ -233,23 +233,25 @@ language plpgsql
 security definer set search_path = public
 as $$
 begin
-  -- Fail-safe: Use a begin-exception block so that if profile creation fails,
-  -- the user is still created in auth.users (prevents the 500 error).
-  begin
-    insert into public.profiles (id, email, name, role, department)
-    values (
-      new.id, 
-      new.email, 
-      coalesce(new.raw_user_meta_data->>'name', ''), 
-      coalesce(new.raw_user_meta_data->>'role', 'member'),
-      new.raw_user_meta_data->>'department'
-    )
-    on conflict (id) do nothing;
-  exception when others then
-    -- Log the error if needed (Postgres logs)
-    return new;
-  end;
-  
+  -- Use UPSERT logic: If the profile already exists, update it.
+  -- This is more robust than 'do nothing'.
+  insert into public.profiles (id, email, name, role, department)
+  values (
+    new.id, 
+    new.email, 
+    coalesce(new.raw_user_meta_data->>'name', ''), 
+    coalesce(new.raw_user_meta_data->>'role', 'member'),
+    new.raw_user_meta_data->>'department'
+  )
+  on conflict (id) do update set
+    email = excluded.email,
+    name = excluded.name,
+    department = excluded.department,
+    updated_at = now();
+    
+  return new;
+exception when others then
+  -- Still return 'new' to allow the auth user creation to succeed
   return new;
 end;
 $$;

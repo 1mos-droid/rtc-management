@@ -106,27 +106,23 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      console.log("Attempting signup for:", email);
+      console.log("Initiating signup for:", email);
       const { data, error: authError } = await supabase.auth.signUp({ 
         email, 
         password,
         options: {
           data: {
             name,
-            email, // redundantly pass email in metadata for the trigger
+            email,
             department,
             role: ROLES.MEMBER
           }
         }
       });
       
-      if (authError) {
-        console.error("Supabase Auth signUp error:", authError);
-        throw authError;
-      }
+      if (authError) throw authError;
 
       if (data.user) {
-        console.log("User created successfully:", data.user.id);
         const combinedUser = { 
           id: data.user.id, 
           email: data.user.email, 
@@ -135,14 +131,33 @@ export const AuthProvider = ({ children }) => {
           department 
         };
         
+        // If the user is logged in immediately (Confirm Email is OFF in Supabase),
+        // we can and should perform a client-side upsert to ensure the profile exists.
         if (data.session) {
+          console.log("Session detected, performing manual profile sync...");
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .upsert({
+              id: data.user.id,
+              email: data.user.email,
+              name,
+              role: ROLES.MEMBER,
+              department
+            });
+          
+          if (profileError) {
+            console.error("Manual profile sync failed:", profileError);
+          } else {
+            console.log("Manual profile sync successful.");
+          }
+          
           setUser(combinedUser);
         }
         
         return { user: combinedUser, session: data.session };
       }
     } catch (err) {
-      console.error("Final Signup Error Catch:", err);
+      console.error("Signup Error:", err);
       let message = err.message || 'Registration failed.';
       setError(message);
       throw new Error(message);
