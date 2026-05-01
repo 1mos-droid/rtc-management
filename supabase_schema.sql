@@ -225,13 +225,30 @@ create policy "Developers and Admins can manage resources."
     get_my_role() in ('admin', 'developer')
   );
 
--- 7. MAKE YOURSELF THE DEVELOPER (Retroactively)
--- Note: This requires auth.users to have at least one user.
--- insert into public.profiles (id, email, name, role)
--- select id, email, 'Super Admin', 'developer'
--- from auth.users
--- on conflict (id) do update set role = 'developer';
+-- 7. TRIGGER FOR AUTOMATIC PROFILE CREATION
+-- This ensures every new user gets a profile even if client-side insert fails (e.g. due to RLS + email confirmation)
+create or replace function public.handle_new_user()
+returns trigger as $$
+begin
+  insert into public.profiles (id, email, name, role, department)
+  values (
+    new.id, 
+    new.email, 
+    new.raw_user_meta_data->>'name', 
+    coalesce(new.raw_user_meta_data->>'role', 'member'),
+    new.raw_user_meta_data->>'department'
+  )
+  on conflict (id) do nothing;
+  return new;
+end;
+$$ language plpgsql security definer;
 
--- Realtime: Enable for all tables
+-- Trigger should only run after insert into auth.users
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
+
+-- 8. REALTIME: Enable for all tables
 drop publication if exists supabase_realtime;
 create publication supabase_realtime for table members, transactions, events, bible_studies, resources, attendance, profiles;
