@@ -26,17 +26,17 @@ const Signup = () => {
   const { refreshUserContext, showNotification } = useWorkspace();
   const { signup, isAuthenticated } = useAuth();
 
-  useEffect(() => {
-    if (isAuthenticated && !signupSuccess) {
-      navigate('/');
-    }
-  }, [navigate, isAuthenticated, signupSuccess]);
-
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [signupSuccess, setSignupSuccess] = useState(false);
   const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '', department: '' });
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (isAuthenticated && !signupSuccess) {
+      navigate('/');
+    }
+  }, [navigate, isAuthenticated, signupSuccess]);
 
   const handleSignup = async (e) => {
     e.preventDefault();

@@ -8,71 +8,67 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [mimicRole, setMimicRole] = useState(null);
 
-  const ensureProfileExists = useCallback(async (authUser) => {
+  const ensureProfileSync = useCallback(async (authUser) => {
     if (!authUser) return null;
 
     try {
-      // 1. Try to fetch the existing profile
-      const { data: profile, error: fetchError } = await supabase
+      // Check if profile exists
+      const { data: profile } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', authUser.id)
-        .single();
+        .maybeSingle();
 
-      if (profile) return profile;
+      if (!profile) {
+        console.log("🛠️ Creating profile for new user...");
+        const { data: newProfile, error: insertError } = await supabase
+          .from('profiles')
+          .insert([{
+            id: authUser.id,
+            email: authUser.email,
+            name: authUser.user_metadata?.name || authUser.email?.split('@')[0] || 'Member',
+            role: authUser.user_metadata?.role || ROLES.MEMBER,
+            department: authUser.user_metadata?.department || null
+          }])
+          .select()
+          .maybeSingle();
 
-      // 2. If not found, create it using metadata
-      console.log("Profile missing, creating from metadata...");
-      const { data: newProfile, error: insertError } = await supabase
-        .from('profiles')
-        .upsert({
-          id: authUser.id,
-          email: authUser.email,
-          name: authUser.user_metadata?.name || 'New Member',
-          role: authUser.user_metadata?.role || ROLES.MEMBER,
-          department: authUser.user_metadata?.department || null
-        })
-        .select()
-        .single();
-
-      if (insertError) {
-        console.error("Failed to auto-create profile:", insertError);
-        return null;
+        if (insertError) {
+          console.error("❌ Profile Creation Failed:", insertError.message);
+          return null;
+        }
+        return newProfile;
       }
 
-      return newProfile;
+      return profile;
     } catch (err) {
-      console.error("ensureProfileExists error:", err);
+      console.error("🛑 Profile sync error:", err);
       return null;
     }
   }, [ROLES]);
 
   const fetchUserMetadata = useCallback(async (authUser) => {
     try {
-      const profile = await ensureProfileExists(authUser);
+      const profile = await ensureProfileSync(authUser);
       
-      if (profile) {
-        return {
-          id: authUser.id,
-          email: authUser.email,
-          name: profile.name,
-          role: profile.role || ROLES.MEMBER,
-          department: profile.department,
-        };
-      }
+      return {
+        id: authUser.id,
+        email: authUser.email,
+        name: profile?.name || authUser.user_metadata?.name || 'Member',
+        role: profile?.role || authUser.user_metadata?.role || ROLES.MEMBER,
+        department: profile?.department || authUser.user_metadata?.department || null,
+      };
     } catch (err) {
       console.error("Failed to fetch user metadata:", err);
+      return { 
+        id: authUser.id, 
+        email: authUser.email, 
+        name: authUser.user_metadata?.name || 'Member',
+        role: authUser.user_metadata?.role || ROLES.MEMBER, 
+        department: authUser.user_metadata?.department || null 
+      };
     }
-    
-    // Fallback to metadata if profile sync is still failing
-    return { 
-      id: authUser.id, 
-      email: authUser.email, 
-      name: authUser.user_metadata?.name || 'Member',
-      role: authUser.user_metadata?.role || ROLES.MEMBER, 
-      department: authUser.user_metadata?.department || null 
-    };
-  }, [ensureProfileExists, ROLES]);
+  }, [ensureProfileSync, ROLES]);
 
   const refreshUser = useCallback(async () => {
     setLoading(true);

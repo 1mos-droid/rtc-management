@@ -62,7 +62,7 @@ create policy "Developers and Admins can update any profile."
 create table public.members (
   id uuid default gen_random_uuid() primary key,
   name text not null,
-  email text,
+  email text unique, -- Added UNIQUE constraint for reliable syncing
   phone text,
   address text,
   dob date,
@@ -233,25 +233,19 @@ language plpgsql
 security definer set search_path = public
 as $$
 begin
-  -- Use UPSERT logic: If the profile already exists, update it.
-  -- This is more robust than 'do nothing'.
+  -- Only insert into profiles on first signup
   insert into public.profiles (id, email, name, role, department)
   values (
     new.id, 
     new.email, 
     coalesce(new.raw_user_meta_data->>'name', ''), 
-    coalesce(new.raw_user_meta_data->>'role', 'member'),
+    'member',
     new.raw_user_meta_data->>'department'
   )
-  on conflict (id) do update set
-    email = excluded.email,
-    name = excluded.name,
-    department = excluded.department,
-    updated_at = now();
+  on conflict (id) do nothing;
     
   return new;
 exception when others then
-  -- Still return 'new' to allow the auth user creation to succeed
   return new;
 end;
 $$;
