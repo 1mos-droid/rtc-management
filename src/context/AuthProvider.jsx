@@ -106,23 +106,27 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      // We pass the user metadata in the signUp call so that it's available 
-      // in auth.users, allowing a database trigger to create the profile automatically.
+      console.log("Attempting signup for:", email);
       const { data, error: authError } = await supabase.auth.signUp({ 
         email, 
         password,
         options: {
           data: {
             name,
+            email, // redundantly pass email in metadata for the trigger
             department,
             role: ROLES.MEMBER
           }
         }
       });
       
-      if (authError) throw authError;
+      if (authError) {
+        console.error("Supabase Auth signUp error:", authError);
+        throw authError;
+      }
 
       if (data.user) {
+        console.log("User created successfully:", data.user.id);
         const combinedUser = { 
           id: data.user.id, 
           email: data.user.email, 
@@ -131,8 +135,6 @@ export const AuthProvider = ({ children }) => {
           department 
         };
         
-        // Only set the user in local state if there's an active session
-        // (If session is null, email confirmation is required)
         if (data.session) {
           setUser(combinedUser);
         }
@@ -140,7 +142,7 @@ export const AuthProvider = ({ children }) => {
         return { user: combinedUser, session: data.session };
       }
     } catch (err) {
-      console.error("Signup Error:", err);
+      console.error("Final Signup Error Catch:", err);
       let message = err.message || 'Registration failed.';
       setError(message);
       throw new Error(message);
