@@ -123,26 +123,16 @@ export const AuthProvider = ({ children }) => {
       if (authError) throw authError;
 
       if (data.user) {
-        // Fallback: Try to create the profile client-side. 
-        // This might fail if email confirmation is enabled due to RLS,
-        // but the database trigger will handle it in that case.
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert([{ 
-            id: data.user.id, 
-            email,
-            name, 
-            role: ROLES.MEMBER, 
-            department 
-          }]);
-        
-        if (profileError) {
-          console.warn("Client-side profile creation skipped or failed (expected if email confirmation is on):", profileError);
-        }
-
-        const combinedUser = { id: data.user.id, email, name, role: ROLES.MEMBER, department };
+        const combinedUser = { 
+          id: data.user.id, 
+          email: data.user.email, 
+          name, 
+          role: ROLES.MEMBER, 
+          department 
+        };
         
         // Only set the user in local state if there's an active session
+        // (If session is null, email confirmation is required)
         if (data.session) {
           setUser(combinedUser);
         }

@@ -228,7 +228,10 @@ create policy "Developers and Admins can manage resources."
 -- 7. TRIGGER FOR AUTOMATIC PROFILE CREATION
 -- This ensures every new user gets a profile even if client-side insert fails (e.g. due to RLS + email confirmation)
 create or replace function public.handle_new_user()
-returns trigger as $$
+returns trigger
+language plpgsql
+security definer set search_path = public
+as $$
 begin
   insert into public.profiles (id, email, name, role, department)
   values (
@@ -241,7 +244,7 @@ begin
   on conflict (id) do nothing;
   return new;
 end;
-$$ language plpgsql security definer;
+$$;
 
 -- Trigger should only run after insert into auth.users
 drop trigger if exists on_auth_user_created on auth.users;
