@@ -45,7 +45,7 @@ export const AuthProvider = ({ children }) => {
       console.error("🛑 Profile sync error:", err);
       return null;
     }
-  }, [ROLES]);
+  }, []);
 
   const fetchUserMetadata = useCallback(async (authUser) => {
     try {
@@ -68,7 +68,7 @@ export const AuthProvider = ({ children }) => {
         department: authUser.user_metadata?.department || null 
       };
     }
-  }, [ensureProfileSync, ROLES]);
+  }, [ensureProfileSync]);
 
   const refreshUser = useCallback(async () => {
     setLoading(true);

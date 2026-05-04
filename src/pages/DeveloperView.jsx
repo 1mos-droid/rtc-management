@@ -189,7 +189,7 @@ const DeveloperView = () => {
           { label: 'System Uptime', value: stats.uptime, icon: <HardDrive size={20}/>, color: '#9C27B0' },
           { label: 'API Latency', value: stats.latency, icon: <Cpu size={20}/>, color: '#ED6C02' },
         ].map((stat, i) => (
-          <Grid key={i} item xs={12} sm={6} md={2.4}>
+          <Grid key={i} size={{ xs: 12, sm: 6, md: 2.4 }}>
             <Paper elevation={0} sx={{ p: 3, borderRadius: 4, border: `1px solid ${theme.palette.divider}`, bgcolor: alpha(stat.color, 0.02) }}>
               <Box sx={{ color: stat.color, mb: 1 }}>{stat.icon}</Box>
               <Typography variant="caption" color="text.secondary" fontWeight={700}>{stat.label}</Typography>
@@ -201,7 +201,7 @@ const DeveloperView = () => {
 
       <Grid container spacing={4}>
         {/* Diagnostic Logs */}
-        <Grid item xs={12} md={7}>
+        <Grid size={{ xs: 12, md: 7 }}>
           <Paper elevation={0} sx={{ p: 4, borderRadius: 6, border: `1px solid ${theme.palette.divider}`, height: '100%' }}>
             <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "center", mb: 3 }}>
               <Typography variant="h5" fontWeight={900} sx={{ fontFamily: 'DM Serif Display' }}>Diagnostic Logs</Typography>
@@ -229,7 +229,7 @@ const DeveloperView = () => {
         </Grid>
 
         {/* Bug Reports */}
-        <Grid item xs={12} md={5}>
+        <Grid size={{ xs: 12, md: 5 }}>
           <Paper elevation={0} sx={{ p: 4, borderRadius: 6, border: `1px solid ${theme.palette.divider}`, height: '100%' }}>
             <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", mb: 3 }}>
               <Bug size={20} color={theme.palette.error.main} />

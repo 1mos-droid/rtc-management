@@ -262,7 +262,7 @@ const Dashboard = () => {
             </Stack>
             <Grid container spacing={3}>
               {filteredData.members.slice(0, canViewFinancials ? 4 : 8).map((m) => (
-                  <Grid item xs={12} md={canViewFinancials ? 12 : 6} key={m.id}>
+                  <Grid size={{ xs: 12, md: canViewFinancials ? 12 : 6 }} key={m.id}>
                       <Paper elevation={0} sx={{ p: 3, borderRadius: 4, display: 'flex', alignItems: 'center', gap: 3, border: `1px solid ${theme.palette.divider}` }}>
                           <Avatar sx={{ bgcolor: alpha(theme.palette.primary.main, 0.05), color: theme.palette.primary.main, fontWeight: 900 }}>{m.name?.charAt(0)}</Avatar>
                           <Box sx={{ flexGrow: 1 }}><Typography variant="body1" fontWeight={800}>{m.name}</Typography><Typography variant="caption" color="text.disabled">{m.department || 'General'}</Typography></Box>
@@ -286,7 +286,7 @@ const Dashboard = () => {
             </Stack>
             <Grid container spacing={3}>
               {filteredData.events.slice(0, 6).map((e) => (
-                  <Grid item xs={12} md={4} key={e.id}>
+                  <Grid size={{ xs: 12, md: 4 }} key={e.id}>
                       <Paper elevation={0} sx={{ p: 3, borderRadius: 4, border: `1px solid ${theme.palette.divider}` }}>
                           <Typography variant="subtitle2" fontWeight={900} color="primary.main" sx={{ mb: 1 }}>{format(safeParseDate(e.date), 'MMM dd, yyyy')}</Typography>
                           <Typography variant="body1" fontWeight={800}>{e.name}</Typography>
