@@ -143,7 +143,7 @@ const Events = () => {
           <Typography variant="overline" color="primary" fontWeight={800} letterSpacing={3}>CHURCH AGENDA</Typography>
           <Typography variant="h2" sx={{ fontWeight: 900, mt: 1, fontSize: { xs: '2rem', md: '3rem' } }}>Calendar of Service</Typography>
           <Typography variant="body1" color="text.secondary" sx={{ mt: 1.5, maxWidth: 600, fontSize: '1rem' }}>
-             Upcoming services, fellowships, and community engagement activities at Redeem Transformation Chapel.
+             Upcoming services, fellowships, and community engagement activities at Redeemed Transformation Chapel International.
           </Typography>
         </Box>
         {canManage && (

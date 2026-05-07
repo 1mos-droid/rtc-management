@@ -294,7 +294,7 @@ const AppLayout = ({ children }) => {
              <Leaf size={24} /> <Heart size={24} /> <Leaf size={24} />
           </Stack>
           <Typography variant="body2" color="text.secondary" fontWeight={800} sx={{ letterSpacing: 4, textTransform: 'uppercase', fontSize: '0.65rem' }}>
-              Redeem Transformation Chapel
+              Redeemed Transformation Chapel International
           </Typography>
           <Typography variant="caption" color="text.disabled" sx={{ mt: 2, display: 'block', fontFamily: 'Lora', fontStyle: 'italic' }}>
               The Living Vine | Founded in Faith, Growing in Love.

@@ -123,7 +123,7 @@ const QuickSwitch = () => {
                         </Box>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                             <Typography variant="caption" fontWeight={900} color="text.disabled" sx={{ letterSpacing: 2 }}>ARCHITECTURE</Typography>
-                            <Typography variant="caption" fontWeight={900}>RTC v2.0</Typography>
+                            <Typography variant="caption" fontWeight={900}>RTCI v2.0</Typography>
                         </Box>
                     </Stack>
                 </Paper>
@@ -133,7 +133,7 @@ const QuickSwitch = () => {
                     <Server size={32} style={{ marginBottom: 32 }} />
                     <Typography variant="h5" fontWeight={900} sx={{ fontFamily: 'DM Serif Display' }}>Cloud Sanctuary</Typography>
                     <Typography variant="body2" sx={{ mt: 3, opacity: 0.9, lineHeight: 1.8, fontFamily: 'Lora' }}>
-                        The RTC environment is strictly isolated and synchronized with our secure ministerial cloud infrastructure.
+                        The RTCI environment is strictly isolated and synchronized with our secure ministerial cloud infrastructure.
                     </Typography>
                 </Paper>
             </Stack>

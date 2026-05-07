@@ -47,7 +47,7 @@ const Reports = () => {
         return;
       }
 
-      const fileName = `RTC_${type}_${new Date().toISOString().slice(0,10)}`;
+      const fileName = `RTCI_${type}_${new Date().toISOString().slice(0,10)}`;
       if (format === 'pdf') {
         const doc = new jsPDF();
         doc.text(`${type.toUpperCase()} AUDIT REPORT`, 14, 20);

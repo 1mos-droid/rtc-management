@@ -27,7 +27,7 @@ const initializeNetworkGuard = () => {
 
     // Client-side rate limiting
     if (requestCount > MAX_REQUESTS_PER_10S) {
-      window.dispatchEvent(new CustomEvent('rtc-security-alert', { detail: { type: 'rate_limit_exceeded' } }));
+      window.dispatchEvent(new CustomEvent('rtci-security-alert', { detail: { type: 'rate_limit_exceeded' } }));
       return new Response(JSON.stringify({ error: "Client-side rate limit exceeded." }), {
         status: 429,
         statusText: "Too Many Requests"
@@ -53,22 +53,22 @@ const initializeNetworkGuard = () => {
       if (timeoutId) clearTimeout(timeoutId);
 
       if (response.status === 429) {
-        window.dispatchEvent(new CustomEvent('rtc-security-alert', { detail: { type: 'server_rate_limit' } }));
+        window.dispatchEvent(new CustomEvent('rtci-security-alert', { detail: { type: 'server_rate_limit' } }));
       }
       if (response.status === 401 || response.status === 403) {
-        window.dispatchEvent(new CustomEvent('rtc-security-alert', { detail: { type: 'auth_anomaly' } }));
+        window.dispatchEvent(new CustomEvent('rtci-security-alert', { detail: { type: 'auth_anomaly' } }));
       }
       if (response.status >= 500) {
-         window.dispatchEvent(new CustomEvent('rtc-security-alert', { detail: { type: 'server_error' } }));
+         window.dispatchEvent(new CustomEvent('rtci-security-alert', { detail: { type: 'server_error' } }));
       }
 
       return response;
     } catch (error) {
       if (timeoutId) clearTimeout(timeoutId);
       if (error.name === 'AbortError') {
-        window.dispatchEvent(new CustomEvent('rtc-security-alert', { detail: { type: 'timeout' } }));
+        window.dispatchEvent(new CustomEvent('rtci-security-alert', { detail: { type: 'timeout' } }));
       } else if (error.message && error.message.includes('Failed to fetch')) {
-        window.dispatchEvent(new CustomEvent('rtc-security-alert', { detail: { type: 'offline' } }));
+        window.dispatchEvent(new CustomEvent('rtci-security-alert', { detail: { type: 'offline' } }));
       }
       throw error;
     }
@@ -93,8 +93,8 @@ export const SecurityManager = ({ children }) => {
       }
     };
 
-    window.addEventListener('rtc-security-alert', handleSecurityAlert);
-    return () => window.removeEventListener('rtc-security-alert', handleSecurityAlert);
+    window.addEventListener('rtci-security-alert', handleSecurityAlert);
+    return () => window.removeEventListener('rtci-security-alert', handleSecurityAlert);
   }, []);
 
   const handleLockdownReset = async () => {

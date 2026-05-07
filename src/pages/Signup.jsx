@@ -48,7 +48,7 @@ const Signup = () => {
     }
 
     if (containsMaliciousPattern(formData.name) || containsMaliciousPattern(formData.email) || containsMaliciousPattern(formData.department)) {
-      window.dispatchEvent(new CustomEvent('rtc-security-alert', { detail: { type: 'injection_attempt' } }));
+      window.dispatchEvent(new CustomEvent('rtci-security-alert', { detail: { type: 'injection_attempt' } }));
       return;
     }
 

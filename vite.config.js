@@ -9,9 +9,9 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: 'Redeem Transformation Chapel',
-        short_name: 'RTC CMS',
-        description: 'RTC Church Management System',
+        name: 'Redeemed Transformation Chapel International',
+        short_name: 'RTCI CMS',
+        description: 'RTCI Church Management System',
         theme_color: '#2C5E50',
         icons: [
           {

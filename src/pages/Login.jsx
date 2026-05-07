@@ -130,8 +130,7 @@ const Login = () => {
                 Welcome Home
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ fontFamily: 'Lora', fontStyle: 'italic' }}>
-                Redeem Transformation Chapel
-              </Typography>
+                Redeemed Transformation Chapel International              </Typography>
             </Box>
 
             <form onSubmit={handleLogin}>

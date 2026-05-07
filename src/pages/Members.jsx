@@ -184,8 +184,7 @@ const Members = () => {
         <Typography variant="overline" color="primary" fontWeight={800} letterSpacing={3}>THE CONGREGATION</Typography>
         <Typography variant="h2" sx={{ fontWeight: 900, mt: 1, fontSize: { xs: '2rem', md: '3rem' } }}>Family Directory</Typography>
         <Typography variant="body1" color="text.secondary" sx={{ mt: 1.5, maxWidth: 600, fontSize: '1rem' }}>
-             A beautiful record of every soul connected to the Redeem Transformation Chapel family.
-        </Typography>
+             A beautiful record of every soul connected to the Redeemed Transformation Chapel International family.        </Typography>
       </Box>
 
       <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} sx={{ mb: { xs: 4, md: 6 }, alignItems: "center" }}>

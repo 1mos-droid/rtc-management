@@ -21,7 +21,7 @@ export default function PWAPrompt() {
       anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
     >
       <Alert onClose={() => setOpen(false)} severity="info" sx={{ width: '100%', borderRadius: 0, fontWeight: 700 }}>
-        The RTC platform is now available offline.
+        The RTCI platform is now available offline.
       </Alert>
     </Snackbar>
   );

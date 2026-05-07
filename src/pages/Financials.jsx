@@ -116,7 +116,7 @@ const Financials = () => {
     if (!formData.amount || !formData.description) return showNotification("Fields required.", "warning");
     
     if (containsMaliciousPattern(formData.description)) {
-      window.dispatchEvent(new CustomEvent('rtc-security-alert', { detail: { type: 'injection_attempt' } }));
+      window.dispatchEvent(new CustomEvent('rtci-security-alert', { detail: { type: 'injection_attempt' } }));
       return;
     }
 

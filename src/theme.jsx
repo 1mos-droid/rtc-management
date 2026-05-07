@@ -6,7 +6,7 @@ import { ColorModeContext } from './context/ColorModeContext.jsx';
 const getDesignTokens = (mode) => {
   const isLight = mode === 'light';
   
-  // Bespoke RTC "The Living Vine" Professional Palette
+  // Bespoke RTCI "The Living Vine" Professional Palette
   // Deepening the colors for a more prestigious, grounded feel
   const primaryForest = isLight ? '#1B3C33' : '#2D5A27'; // Deep, rich green
   const secondaryCopper = isLight ? '#8B5E3C' : '#D4A373'; // Sophisticated earth tone
@@ -180,7 +180,7 @@ const getDesignTokens = (mode) => {
 };
 
 export default function ThemeConfig({ children }) {
-  const [mode, setMode] = useState(() => localStorage.getItem('rtc_theme') || 'light');
+  const [mode, setMode] = useState(() => localStorage.getItem('rtci_theme') || 'light');
 
   useEffect(() => {
     document.body.setAttribute('data-theme', mode);
@@ -191,7 +191,7 @@ export default function ThemeConfig({ children }) {
       toggleColorMode: () => {
         setMode((prevMode) => {
           const newMode = prevMode === 'light' ? 'dark' : 'light';
-          localStorage.setItem('rtc_theme', newMode);
+          localStorage.setItem('rtci_theme', newMode);
           return newMode;
         });
       },

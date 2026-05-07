@@ -36,7 +36,7 @@ const Help = () => {
   const [expandedId, setExpandedId] = useState(null);
 
   const faqs = [
-    { id: 1, q: "How is data synchronization handled?", a: "The RTC system utilizes real-time Firebase listeners to ensure that congregational and financial data is updated instantly across all active ministerial sessions." },
+    { id: 1, q: "How is data synchronization handled?", a: "The RTCI system utilizes real-time Firebase listeners to ensure that congregational and financial data is updated instantly across all active ministerial sessions." },
     { id: 2, q: "Is the platform accessible offline?", a: "Yes. As a Progressive Web App (PWA), core registry and curriculum files are cached locally on your device for access during limited connectivity." },
     { id: 3, q: "Who manages system privileges?", a: "Ministerial access levels are governed by the Security module, accessible only by the Senior Administrator in the Main Sanctuary environment." }
   ];
@@ -53,7 +53,7 @@ const Help = () => {
         </Stack>
         <Typography variant="h2" sx={{ fontWeight: 400, color: 'primary.main', mb: 2 }}>Navigating the Sanctuary</Typography>
         <Typography variant="body1" color="text.secondary" sx={{ mt: 2, maxWidth: 600, mx: 'auto', fontFamily: 'Lora', fontStyle: 'italic' }}>
-             A collection of guides and protocols to assist you in the diligent operation of the RTC digital infrastructure.
+             A collection of guides and protocols to assist you in the diligent operation of the RTCI digital infrastructure.
         </Typography>
         
         <Paper elevation={0} sx={{ mt: 8, maxWidth: 700, mx: 'auto', p: 1, borderRadius: 100, border: `1px solid ${theme.palette.divider}`, display: 'flex', alignItems: 'center', gap: 2, overflow: 'hidden' }}>
@@ -98,7 +98,7 @@ const Help = () => {
                 </Typography>
                 <Button fullWidth variant="contained" sx={{ py: 2, borderRadius: 100 }}>Initiate Assistance</Button>
                 <Box sx={{ mt: 5, textAlign: 'center' }}>
-                    <Typography variant="caption" fontWeight={900} color="text.disabled" sx={{ letterSpacing: 2 }}>SUPPORT@RTCCHAPEL.ORG</Typography>
+                    <Typography variant="caption" fontWeight={900} color="text.disabled" sx={{ letterSpacing: 2 }}>SUPPORT@RTCICHAPEL.ORG</Typography>
                 </Box>
             </Paper>
         </Grid>
