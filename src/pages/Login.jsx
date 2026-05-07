@@ -17,7 +17,8 @@ import {
   Divider,
   Stack
 } from '@mui/material';
-import { User, Lock, Eye, EyeOff, ArrowRight, ShieldCheck, Leaf, Heart, AlertTriangle } from 'lucide-react';
+import { User, Lock, Eye, EyeOff, ArrowRight, ShieldCheck, Heart, AlertTriangle } from 'lucide-react';
+import logo from '../assets/logo.png';
 
 const Login = () => {
   const theme = useTheme();
@@ -100,26 +101,22 @@ const Login = () => {
             bgcolor: alpha(theme.palette.background.paper, 0.8),
             backdropFilter: 'blur(40px)',
             textAlign: 'center',
-            boxShadow: '0 40px 100px -20px rgba(74, 103, 65, 0.15)',
+            boxShadow: '0 40px 100px -20px rgba(138, 3, 50, 0.15)',
             position: 'relative',
             overflow: 'hidden'
           }}>
             <Box sx={{ mb: 8 }}>
-              <Box>
-                <Box sx={{ 
-                    width: 72, height: 72,
-                    bgcolor: 'primary.main', 
-                    color: '#fff',
-                    mx: 'auto',
-                    mb: 4,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderRadius: '50%',
-                    boxShadow: `0 12px 32px ${alpha(theme.palette.primary.main, 0.3)}`
-                }}>
-                    <Leaf size={32} fill="currentColor" />
-                </Box>
+              <Box sx={{ 
+                  width: 160, height: 160,
+                  mx: 'auto',
+                  mb: 4,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'transform 0.5s ease',
+                  '&:hover': { transform: 'scale(1.05)' }
+              }}>
+                  <img src={logo} alt="RTCI Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
               </Box>
               
               <Typography variant="h2" sx={{ 
@@ -130,7 +127,8 @@ const Login = () => {
                 Welcome Home
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ fontFamily: 'Lora', fontStyle: 'italic' }}>
-                Redeemed Transformation Chapel International              </Typography>
+                Redeemed Transformation Chapel International
+              </Typography>
             </Box>
 
             <form onSubmit={handleLogin}>

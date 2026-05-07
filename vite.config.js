@@ -12,7 +12,7 @@ export default defineConfig({
         name: 'Redeemed Transformation Chapel International',
         short_name: 'RTCI CMS',
         description: 'RTCI Church Management System',
-        theme_color: '#2C5E50',
+        theme_color: '#8A0332',
         icons: [
           {
             src: 'pwa-192x192.png',

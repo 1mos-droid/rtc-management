@@ -7,7 +7,7 @@ drop table if exists public.profiles cascade;
 drop table if exists public.bible_studies cascade;
 drop table if exists public.resources cascade;
 
--- 🌿 THE LIVING VINE - NEW CENTRALIZED SCHEMA
+-- RTCI - NEW CENTRALIZED SCHEMA
 
 -- 1. PROFILES TABLE
 create table public.profiles (

@@ -193,7 +193,7 @@ const Dashboard = () => {
                 </Typography>
             </Stack>
             <Typography variant="h1" sx={{ fontSize: { xs: '2.5rem', md: '4.5rem' }, color: 'primary.main', mb: 2 }}>
-                The Living Vine
+                Redeemed Transformation Chapel Int.
             </Typography>
             <Typography variant="h5" sx={{ fontStyle: 'italic', color: 'text.secondary', fontFamily: 'Lora', maxWidth: 700, lineHeight: 1.4, fontSize: { xs: '1.1rem', md: '1.5rem' } }}>
                 Gathered in grace, connected in love, and thriving in service.

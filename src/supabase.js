@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
 /**
- * 🌿 THE LIVING VINE - SUPABASE CONFIGURATION
+ * RTCI - SUPABASE CONFIGURATION
  * Using environment variables for production security.
  */
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://placeholder.supabase.co';

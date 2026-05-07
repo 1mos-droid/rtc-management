@@ -25,6 +25,7 @@ import { Menu as MenuIcon, X, LogOut, Heart, User, Settings, Leaf, Sparkles, Ter
 import { useColorMode } from '../context/ColorModeContext.jsx';
 import { useWorkspace } from '../context/WorkspaceContext';
 import { useAuth } from '../context/AuthContext';
+import logo from '../assets/logo.png';
 
 const FloatingNav = styled(Box)(({ theme }) => ({
   position: 'fixed',
@@ -159,12 +160,14 @@ const AppLayout = ({ children }) => {
           component={Link} to="/" 
           sx={{ 
             width: 44, height: 44, borderRadius: '50%', 
-            bgcolor: 'primary.main', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: '#fff', textDecoration: 'none', transition: 'transform 0.3s ease',
-            '&:hover': { transform: 'rotate(15deg) scale(1.1)' }
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            textDecoration: 'none', transition: 'transform 0.3s ease',
+            border: `1px solid ${alpha(theme.palette.secondary.main, 0.4)}`,
+            overflow: 'hidden',
+            '&:hover': { transform: 'rotate(5deg) scale(1.05)' }
           }}
         >
-          <Leaf size={22} fill="currentColor" />
+          <img src={logo} alt="RTCI" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
         </Box>
 
         {/* Desktop Links */}
@@ -290,14 +293,16 @@ const AppLayout = ({ children }) => {
 
       {/* Elegant Footer */}
       <Box sx={{ py: 10, textAlign: 'center', bgcolor: alpha(theme.palette.primary.main, 0.02) }}>
-          <Stack direction="row" spacing={2} sx={{ justifyContent: "center", mb: 4, opacity: 0.3 }}>
-             <Leaf size={24} /> <Heart size={24} /> <Leaf size={24} />
+          <Stack direction="row" spacing={2} sx={{ justifyContent: "center", mb: 4, opacity: 0.9 }}>
+             <Box sx={{ width: 50, height: 50, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <img src={logo} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+             </Box>
           </Stack>
           <Typography variant="body2" color="text.secondary" fontWeight={800} sx={{ letterSpacing: 4, textTransform: 'uppercase', fontSize: '0.65rem' }}>
               Redeemed Transformation Chapel International
           </Typography>
           <Typography variant="caption" color="text.disabled" sx={{ mt: 2, display: 'block', fontFamily: 'Lora', fontStyle: 'italic' }}>
-              The Living Vine | Founded in Faith, Growing in Love.
+              Transforming Lives | Founded in Faith, Growing in Love.
           </Typography>
       </Box>
     </Box>
