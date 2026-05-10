@@ -17,7 +17,9 @@ import {
   Divider,
   Switch,
   FormControlLabel,
-  Dialog
+  Dialog,
+  Card,
+  CardContent
 } from '@mui/material';
 import { 
   Clock, 
@@ -25,7 +27,8 @@ import {
   Plus, 
   Trash2, 
   Edit,
-  Video
+  Video,
+  Calendar as CalendarIcon
 } from 'lucide-react';
 import EditEventDialog from '../components/EditEventDialog';
 
@@ -35,8 +38,8 @@ import { safeParseDate } from '../utils/dateUtils';
 const Events = () => {
   const theme = useTheme();
   const { filterData, isBranchRestricted, userBranch, showNotification, showConfirmation } = useWorkspace();
-  const { isDeptHead, user, effectiveRole, ROLES } = useAuth();
-  const canManage = isDeptHead; // Includes Admin and Developer
+  const { isDeptHead } = useAuth();
+  const canManage = isDeptHead;
   
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -67,7 +70,7 @@ const Events = () => {
       });
       setEvents(upcoming);
     } catch (err) { // eslint-disable-line no-unused-vars
-      showNotification("Calendar sync failed.", "error");
+      showNotification("Failed to sync calendar.", "error");
     } finally {
       setLoading(false);
     }
@@ -84,7 +87,7 @@ const Events = () => {
   const handleCreate = async (e) => {
     if (!canManage) return;
     e.preventDefault();
-    if (!formData.name || !formData.date) return showNotification("Please provide at least a name and date.", "warning");
+    if (!formData.name || !formData.date) return showNotification("Name and date are required.", "warning");
     setSubmitting(true);
     try {
       const { name, date, time, location, isOnline } = formData;
@@ -101,9 +104,9 @@ const Events = () => {
 
       setFormData({ name: '', date: '', time: '', location: '', isOnline: false });
       setOpenCreator(false);
-      showNotification("Event published to the calendar.", "success");
+      showNotification("Event scheduled successfully.", "success");
     } catch (error) { // eslint-disable-line no-unused-vars
-       showNotification("Publication failed.", "error"); 
+       showNotification("Failed to schedule event.", "error"); 
     } finally { setSubmitting(false); }
   };
 
@@ -115,7 +118,7 @@ const Events = () => {
       showNotification("Event updated successfully.", "success");
       setEditingEvent(null);
     } catch (err) { // eslint-disable-line no-unused-vars
-      showNotification("Update failed.", "error");
+      showNotification("Failed to update event.", "error");
     }
   };
 
@@ -128,105 +131,103 @@ const Events = () => {
             try {
                 const { error } = await supabase.from('events').delete().eq('id', id);
                 if (error) throw error;
-                showNotification("Event cancelled.");
+                showNotification("Event removed.");
             } catch (err) { // eslint-disable-line no-unused-vars
-               showNotification("Operation failed.", "error"); 
+               showNotification("Failed to remove event.", "error"); 
             }
         }
     });
   };
 
   return (
-    <Box sx={{ pb: 6 }}>
+    <Box>
       {/* Header */}
-      <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} sx={{ justifyContent: "space-between", alignItems: "flex-end", mb: { xs: 4, md: 6 } }}>
+      <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} sx={{ justifyContent: "space-between", alignItems: { md: 'center' }, mb: 6 }}>
         <Box>
-          <Typography variant="overline" color="primary" fontWeight={800} letterSpacing={3}>CHURCH AGENDA</Typography>
-          <Typography variant="h2" sx={{ fontWeight: 900, mt: 1, fontSize: { xs: '2rem', md: '3rem' } }}>Calendar of Service</Typography>
-          <Typography variant="body1" color="text.secondary" sx={{ mt: 1.5, maxWidth: 600, fontSize: '1rem' }}>
-             Upcoming services, fellowships, and community engagement activities at Redeemed Transformation Chapel International.
-          </Typography>
+          <Typography variant="h2">Calendar of Service</Typography>
+          <Typography variant="body1" color="text.secondary">Upcoming services, fellowships, and community activities.</Typography>
         </Box>
         {canManage && (
             <Button 
                 variant="contained" 
-                size="small"
                 startIcon={<Plus size={18} />} 
                 onClick={() => setOpenCreator(true)}
-                sx={{ px: 4 }}
             >
                 Schedule Event
             </Button>
         )}
       </Stack>
 
-      <Grid container spacing={3}>
-        {loading && events.length === 0 ? <Grid size={{ xs: 12 }}><CircularProgress /></Grid> : filteredEvents.length === 0 ? (
-            <Grid size={{ xs: 12 }}>
-                <Paper variant="outlined" sx={{ p: 6, textAlign: 'center', borderStyle: 'dashed', borderRadius: 0 }}>
-                    <Typography variant="h5" color="text.disabled" sx={{ fontFamily: 'Merriweather', fontStyle: 'italic' }}>The calendar is currently clear.</Typography>
-                </Paper>
-            </Grid>
-        ) : filteredEvents.map((event) => (
-            <Grid size={{ xs: 12, md: 6 }} key={event.id}>
-                <Paper elevation={0} sx={{ 
-                    p: { xs: 2.5, md: 3 }, borderRadius: 0, border: `1px solid ${theme.palette.divider}`,
-                    display: 'flex', gap: { xs: 2, md: 3 }, transition: 'all 0.3s ease',
-                    '&:hover': { borderColor: theme.palette.primary.main, bgcolor: alpha(theme.palette.primary.main, 0.01) }
-                }}>
-                    <Box sx={{ textAlign: 'center', minWidth: { xs: 60, md: 80 } }}>
-                        <Typography variant="h3" fontWeight={900} color="primary" sx={{ lineHeight: 1, fontSize: { xs: '1.5rem', md: '2.5rem' } }}>{format(safeParseDate(event.date), 'dd')}</Typography>
-                        <Typography variant="caption" fontWeight={900} color="text.disabled" sx={{ letterSpacing: 2, textTransform: 'uppercase', fontSize: '0.6rem' }}>{format(safeParseDate(event.date), 'MMM')}</Typography>
+      {loading && events.length === 0 ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 10 }}><CircularProgress size={32} /></Box>
+      ) : (
+          <Grid container spacing={3}>
+            {filteredEvents.length === 0 ? (
+                <Grid item xs={12}>
+                    <Box sx={{ py: 10, textAlign: 'center', border: `2px dashed ${theme.palette.divider}`, borderRadius: 3 }}>
+                        <Typography variant="body1" color="text.disabled">No upcoming events scheduled.</Typography>
                     </Box>
-                    <Divider orientation="vertical" flexItem />
-                    <Box sx={{ flexGrow: 1 }}>
-                        <Typography variant="h6" fontWeight={800} sx={{ mb: 0.5, fontSize: '1.1rem' }}>{event.name}</Typography>
-                        <Stack spacing={0.5}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'text.secondary' }}>
-                                <Clock size={12} /> <Typography variant="caption" fontWeight={700}>{event.time || 'All Day'}</Typography>
+                </Grid>
+            ) : filteredEvents.map((event) => (
+                <Grid item xs={12} md={6} key={event.id}>
+                    <Card elevation={0} sx={{ border: `1px solid ${theme.palette.divider}`, borderRadius: 3, '&:hover': { borderColor: theme.palette.primary.main, bgcolor: alpha(theme.palette.primary.main, 0.01) }, transition: 'all 0.2s ease' }}>
+                        <CardContent sx={{ p: 3, display: 'flex', gap: 3 }}>
+                            <Box sx={{ textAlign: 'center', minWidth: 60 }}>
+                                <Typography variant="h4" fontWeight={800} color="primary" sx={{ lineHeight: 1 }}>{format(safeParseDate(event.date), 'dd')}</Typography>
+                                <Typography variant="caption" fontWeight={700} color="text.secondary" sx={{ textTransform: 'uppercase' }}>{format(safeParseDate(event.date), 'MMM')}</Typography>
                             </Box>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'text.secondary' }}>
-                                {event.isOnline ? <Video size={12}/> : <MapPin size={12} />} 
-                                <Typography variant="caption" fontWeight={700} noWrap>{event.location}</Typography>
+                            <Divider orientation="vertical" flexItem />
+                            <Box sx={{ flexGrow: 1 }}>
+                                <Typography variant="body1" fontWeight={700} sx={{ mb: 1 }}>{event.name}</Typography>
+                                <Stack spacing={1}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'text.secondary' }}>
+                                        <Clock size={14} /> <Typography variant="caption" fontWeight={600}>{event.time || 'All Day'}</Typography>
+                                    </Box>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'text.secondary' }}>
+                                        {event.is_online ? <Video size={14}/> : <MapPin size={14} />} 
+                                        <Typography variant="caption" fontWeight={600} noWrap>{event.location || 'Sanctuary'}</Typography>
+                                    </Box>
+                                </Stack>
                             </Box>
-                        </Stack>
-                    </Box>
-                    {canManage && (
-                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                            <IconButton size="small" onClick={() => setEditingEvent(event)}><Edit size={16}/></IconButton>
-                            <IconButton size="small" color="error" onClick={() => handleDelete(event.id)}><Trash2 size={16}/></IconButton>
-                        </Box>
-                    )}
-                </Paper>
-            </Grid>
-        ))}
-      </Grid>
+                            {canManage && (
+                                <Stack spacing={1}>
+                                    <IconButton size="small" onClick={() => setEditingEvent(event)}><Edit size={16}/></IconButton>
+                                    <IconButton size="small" color="error" onClick={() => handleDelete(event.id)}><Trash2 size={16}/></IconButton>
+                                </Stack>
+                            )}
+                        </CardContent>
+                    </Card>
+                </Grid>
+            ))}
+          </Grid>
+      )}
 
       {/* Creator Dialog */}
-      <Dialog open={openCreator} onClose={() => setOpenCreator(false)} fullWidth maxWidth="sm" slotProps={{ paper: { sx: { borderRadius: 0, p: 4 } } }}>
-          <Typography variant="overline" color="primary" fontWeight={800} letterSpacing={2}>NEW SERVICE</Typography>
-          <Typography variant="h4" sx={{ fontWeight: 900, mt: 1, mb: 4 }}>Schedule Event</Typography>
+      <Dialog open={openCreator} onClose={() => setOpenCreator(false)} fullWidth maxWidth="xs" PaperProps={{ sx: { borderRadius: 3, p: 3 } }}>
+          <Typography variant="h6" fontWeight={800} sx={{ mb: 3 }}>Schedule New Event</Typography>
           
-          <Stack spacing={3}>
-              <TextField fullWidth label="Event Title" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} variant="outlined" />
-              <Grid container spacing={2}>
-                  <Grid size={{ xs: 6 }}>
-                      <TextField fullWidth type="date" label="Date" value={formData.date} onChange={(e) => setFormData({...formData, date: e.target.value})} slotProps={{ inputLabel: { shrink: true } }} />
+          <form onSubmit={handleCreate}>
+              <Stack spacing={3}>
+                  <TextField fullWidth label="Event Title" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
+                  <Grid container spacing={2}>
+                      <Grid item xs={6}>
+                          <TextField fullWidth type="date" label="Date" value={formData.date} onChange={(e) => setFormData({...formData, date: e.target.value})} InputLabelProps={{ shrink: true }} />
+                      </Grid>
+                      <Grid item xs={6}>
+                          <TextField fullWidth type="time" label="Time" value={formData.time} onChange={(e) => setFormData({...formData, time: e.target.value})} InputLabelProps={{ shrink: true }} />
+                      </Grid>
                   </Grid>
-                  <Grid size={{ xs: 6 }}>
-                      <TextField fullWidth type="time" label="Time" value={formData.time} onChange={(e) => setFormData({...formData, time: e.target.value})} slotProps={{ inputLabel: { shrink: true } }} />
-                  </Grid>
-              </Grid>
-              <TextField fullWidth label="Location / Virtual Link" value={formData.location} onChange={(e) => setFormData({...formData, location: e.target.value})} />
-              <FormControlLabel control={<Switch checked={formData.isOnline} onChange={(e) => setFormData({...formData, isOnline: e.target.checked})} />} label="Virtual Event (Online)" />
-          </Stack>
-          
-          <Box sx={{ mt: 6, display: 'flex', gap: 2 }}>
-              <Button fullWidth variant="outlined" onClick={() => setOpenCreator(false)}>Discard</Button>
-              <Button fullWidth variant="contained" disabled={submitting} onClick={handleCreate}>
-                  {submitting ? <CircularProgress size={20} color="inherit" /> : 'Publish Event'}
-              </Button>
-          </Box>
+                  <TextField fullWidth label="Location" value={formData.location} onChange={(e) => setFormData({...formData, location: e.target.value})} />
+                  <FormControlLabel control={<Switch checked={formData.isOnline} onChange={(e) => setFormData({...formData, isOnline: e.target.checked})} />} label="This is an online event" />
+                  
+                  <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
+                      <Button fullWidth variant="outlined" onClick={() => setOpenCreator(false)}>Cancel</Button>
+                      <Button fullWidth variant="contained" type="submit" disabled={submitting}>
+                          {submitting ? <CircularProgress size={20} color="inherit" /> : 'Schedule'}
+                      </Button>
+                  </Box>
+              </Stack>
+          </form>
       </Dialog>
 
       <EditEventDialog open={!!editingEvent} onClose={() => setEditingEvent(null)} event={editingEvent} onEditEvent={handleEdit} />

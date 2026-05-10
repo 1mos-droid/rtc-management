@@ -10,21 +10,14 @@ import {
   Typography,
   Grid,
   Slide,
-  InputAdornment,
   FormControl, 
   InputLabel, 
   Select, 
   MenuItem,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
-  FormLabel,
-  Stack,
-  Avatar,
   CircularProgress,
-  Divider
+  Stack
 } from '@mui/material';
-import { X, UserPlus, User, Mail, Phone, MapPin, Cake, Building, Users, Briefcase } from 'lucide-react';
+import { X } from 'lucide-react';
 import { sanitize, containsMaliciousPattern } from '../utils/sanitizer';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -48,7 +41,7 @@ const AddMemberDialog = ({ open, onClose, onAddMember }) => {
 
   const validate = () => {
     let tempErrors = {};
-    if (!formData.name?.trim()) tempErrors.name = "Full name is essential.";
+    if (!formData.name?.trim()) tempErrors.name = "Full name is required.";
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
   };
@@ -57,7 +50,6 @@ const AddMemberDialog = ({ open, onClose, onAddMember }) => {
     if (validate()) {
       const isMalicious = Object.values(formData).some(val => containsMaliciousPattern(val));
       if (isMalicious) {
-        window.dispatchEvent(new CustomEvent('rtci-security-alert', { detail: { type: 'injection_attempt' } }));
         return;
       }
 
@@ -78,38 +70,35 @@ const AddMemberDialog = ({ open, onClose, onAddMember }) => {
       slots={{ transition: Transition }}
       fullWidth
       maxWidth="sm"
-      slotProps={{ paper: { sx: { borderRadius: 0, p: 4 } } }}
+      PaperProps={{ sx: { borderRadius: 3, p: 3 } }}
     >
-      <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <Box>
-            <Typography variant="overline" color="primary" fontWeight={800} letterSpacing={2}>REGISTRATION</Typography>
-            <Typography variant="h4" sx={{ fontWeight: 900, mt: 1 }}>New Entry</Typography>
-        </Box>
-        <IconButton onClick={onClose} size="small" sx={{ color: 'text.disabled' }}><X size={20}/></IconButton>
-      </Box>
+      <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+        <Typography variant="h6" fontWeight={800}>Register Member</Typography>
+        <IconButton onClick={onClose} size="small"><X size={20}/></IconButton>
+      </Stack>
 
       <DialogContent sx={{ p: 0, overflowY: 'visible' }}>
         <Grid container spacing={3}>
-            <Grid size={{ xs: 12 }}>
-                <TextField fullWidth label="Full Name" name="name" value={formData.name} onChange={handleChange} error={!!errors.name} helperText={errors.name} variant="outlined" />
+            <Grid item xs={12}>
+                <TextField fullWidth label="Full Name" name="name" value={formData.name} onChange={handleChange} error={!!errors.name} helperText={errors.name} />
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField fullWidth label="Email Address" name="email" value={formData.email} onChange={handleChange} variant="outlined" />
+            <Grid item xs={12} sm={6}>
+                <TextField fullWidth label="Email Address" name="email" value={formData.email} onChange={handleChange} />
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField fullWidth label="Telephone" name="phone" value={formData.phone} onChange={handleChange} variant="outlined" />
+            <Grid item xs={12} sm={6}>
+                <TextField fullWidth label="Phone Number" name="phone" value={formData.phone} onChange={handleChange} />
             </Grid>
-            <Grid size={{ xs: 12 }}>
-                <TextField fullWidth label="Residential Address" name="address" value={formData.address} onChange={handleChange} variant="outlined" />
+            <Grid item xs={12}>
+                <TextField fullWidth label="Home Address" name="address" value={formData.address} onChange={handleChange} multiline rows={2} />
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField fullWidth label="Date of Birth" name="dob" type="date" value={formData.dob} onChange={handleChange} slotProps={{ inputLabel: { shrink: true } }} variant="outlined" />
+            <Grid item xs={12} sm={6}>
+                <TextField fullWidth label="Date of Birth" name="dob" type="date" value={formData.dob} onChange={handleChange} InputLabelProps={{ shrink: true }} />
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid item xs={12} sm={6}>
                 <FormControl fullWidth>
                     <InputLabel>Department</InputLabel>
                     <Select name="department" value={formData.department} onChange={handleChange} label="Department">
-                        <MenuItem value=""><em>None</em></MenuItem>
+                        <MenuItem value=""><em>None / General</em></MenuItem>
                         <MenuItem value="Youth">Youth</MenuItem>
                         <MenuItem value="Women">Women</MenuItem>
                         <MenuItem value="Men">Men</MenuItem>
@@ -118,7 +107,7 @@ const AddMemberDialog = ({ open, onClose, onAddMember }) => {
                     </Select>
                 </FormControl>
             </Grid>
-            <Grid size={{ xs: 12, sm: 12 }}>
+            <Grid item xs={12}>
                 <FormControl fullWidth>
                     <InputLabel>Membership Type</InputLabel>
                     <Select name="membershipType" value={formData.membershipType} onChange={handleChange} label="Membership Type">
@@ -131,16 +120,14 @@ const AddMemberDialog = ({ open, onClose, onAddMember }) => {
         </Grid>
       </DialogContent>
 
-      <DialogActions sx={{ p: 0, mt: 6 }}>
-        <Button onClick={onClose} color="inherit" sx={{ fontWeight: 800, opacity: 0.6 }}>Discard</Button>
-        <Box sx={{ flexGrow: 1 }} />
+      <DialogActions sx={{ p: 0, mt: 4 }}>
+        <Button onClick={onClose} color="inherit">Cancel</Button>
         <Button 
             onClick={handleSubmit} 
             variant="contained" 
             disabled={submitting}
-            sx={{ px: 6, py: 1.5, letterSpacing: 2 }}
         >
-            {submitting ? <CircularProgress size={20} color="inherit" /> : 'Confirm Registration'}
+            {submitting ? <CircularProgress size={20} color="inherit" /> : 'Register Member'}
         </Button>
       </DialogActions>
     </Dialog>

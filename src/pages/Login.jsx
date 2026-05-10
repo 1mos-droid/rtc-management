@@ -17,8 +17,9 @@ import {
   Divider,
   Stack
 } from '@mui/material';
-import { User, Lock, Eye, EyeOff, ArrowRight, ShieldCheck, Heart, AlertTriangle } from 'lucide-react';
+import { Lock, Eye, EyeOff, AlertTriangle, Mail } from 'lucide-react';
 import logo from '../assets/logo.png';
+import { supabase } from '../supabase';
 
 const Login = () => {
   const theme = useTheme();
@@ -31,6 +32,7 @@ const Login = () => {
       navigate('/');
     }
   }, [navigate, isAuthenticated]);
+
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -41,7 +43,7 @@ const Login = () => {
     setError('');
     
     if (!formData.email || !formData.password) {
-      setError('Steward credentials are required for entry.');
+      setError('Email and password are required.');
       return;
     }
 
@@ -66,156 +68,105 @@ const Login = () => {
       alignItems: 'center', 
       justifyContent: 'center',
       bgcolor: 'background.default',
-      position: 'relative',
-      overflow: 'hidden',
       p: 3
     }}>
-      {/* --- ORGANIC BACKGROUND ART --- */}
-      <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0 }}>
-        <Box
-            style={{
-                position: 'absolute', top: '-10%', left: '-10%',
-                width: '60vw', height: '60vw',
-                borderRadius: '50%',
-                background: `radial-gradient(circle, ${alpha(theme.palette.primary.main, 0.05)} 0%, transparent 70%)`,
-                filter: 'blur(80px)'
-            }}
-        />
-        <Box
-            style={{
-                position: 'absolute', bottom: '-20%', right: '-10%',
-                width: '70vw', height: '70vw',
-                borderRadius: '50%',
-                background: `radial-gradient(circle, ${alpha(theme.palette.secondary.main, 0.04)} 0%, transparent 70%)`,
-                filter: 'blur(100px)'
-            }}
-        />
-      </Box>
-
-      <Container maxWidth="sm" sx={{ position: 'relative', zIndex: 1 }}>
-        <Box>
-          <Paper elevation={0} sx={{ 
-            p: { xs: 5, sm: 10 }, 
-            borderRadius: 12, 
-            border: `1px solid ${theme.palette.divider}`,
-            bgcolor: alpha(theme.palette.background.paper, 0.8),
-            backdropFilter: 'blur(40px)',
-            textAlign: 'center',
-            boxShadow: '0 40px 100px -20px rgba(138, 3, 50, 0.15)',
-            position: 'relative',
-            overflow: 'hidden'
-          }}>
-            <Box sx={{ mb: 8 }}>
-              <Box sx={{ 
-                  width: 160, height: 160,
-                  mx: 'auto',
-                  mb: 4,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'transform 0.5s ease',
-                  '&:hover': { transform: 'scale(1.05)' }
-              }}>
-                  <img src={logo} alt="RTCI Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-              </Box>
-              
-              <Typography variant="h2" sx={{ 
-                color: 'primary.main',
-                mb: 2,
-                fontSize: { xs: '2.5rem', md: '3.5rem' }
-              }}>
-                Welcome Home
-              </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ fontFamily: 'Lora', fontStyle: 'italic' }}>
-                Redeemed Transformation Chapel International
-              </Typography>
+      <Container maxWidth="sm">
+        <Paper elevation={0} sx={{ 
+          p: { xs: 4, sm: 6 }, 
+          borderRadius: 4, 
+          border: `1px solid ${theme.palette.divider}`,
+          bgcolor: 'background.paper',
+          textAlign: 'center',
+        }}>
+          <Box sx={{ mb: 4 }}>
+            <Box sx={{ width: 80, height: 80, mx: 'auto', mb: 3, bgcolor: 'primary.main', borderRadius: 2, p: 1 }}>
+              <img src={logo} alt="RTCI" style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
             </Box>
-
-            <form onSubmit={handleLogin}>
-              <Stack spacing={3}>
-                
-                {error && (
-                  <Typography variant="caption" color="error" sx={{ 
-                    fontWeight: 800, 
-                    bgcolor: alpha(theme.palette.error.main, 0.05), 
-                    p: 2, 
-                    borderRadius: 4,
-                    letterSpacing: 0.5
-                  }}>
-                    {error}
-                  </Typography>
-                )}
-
-                <TextField
-                  fullWidth
-                  label="Ministerial Email"
-                  type="email"
-                  required
-                  variant="outlined"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                />
-
-                <TextField
-                  fullWidth
-                  label="Secret Password"
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  variant="outlined"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  slotProps={{
-                    input: {
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }
-                  }}
-                />
-
-                <Button
-                  type="submit"
-                  variant="contained"
-                  size="large"
-                  disabled={loading}
-                  sx={{ 
-                    mt: 3,
-                    py: 2.5, 
-                    fontSize: '0.9rem', 
-                    letterSpacing: 3,
-                    borderRadius: 100
-                  }}
-                >
-                  {loading ? <CircularProgress size={24} color="inherit" /> : 'Enter the Sanctuary'}
-                </Button>
-              </Stack>
-            </form>
-
-            <Typography variant="body2" sx={{ mt: 4, color: 'text.secondary' }}>
-              New to the ministry? <Link to="/signup" style={{ color: theme.palette.primary.main, fontWeight: 800, textDecoration: 'none' }}>Register with the Chapel</Link>
+            <Typography variant="h3" sx={{ mb: 1 }}>Welcome Back</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Redeemed Transformation Chapel Administrative Portal
             </Typography>
+          </Box>
 
-            <Divider sx={{ my: 4, opacity: 0.5 }}>OR</Divider>
+          <form onSubmit={handleLogin}>
+            <Stack spacing={3}>
+              {error && (
+                <Box sx={{ bgcolor: alpha(theme.palette.error.main, 0.05), p: 2, borderRadius: 2 }}>
+                  <Typography variant="caption" color="error" fontWeight={700}>{error}</Typography>
+                </Box>
+              )}
 
-            <Button 
-                variant="text" 
-                size="small" 
-                startIcon={<AlertTriangle size={14} />}
-                onClick={async () => {
-                    localStorage.clear();
-                    await supabase.auth.signOut();
-                    window.location.reload();
+              <TextField
+                fullWidth
+                label="Email Address"
+                type="email"
+                required
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Mail size={18} color={theme.palette.text.disabled} />
+                    </InputAdornment>
+                  ),
                 }}
-                sx={{ color: 'text.disabled', fontSize: '0.7rem', fontWeight: 700 }}
-            >
-                Troubleshoot Session (Force Clear)
-            </Button>
-          </Paper>
-        </Box>
+              />
+
+              <TextField
+                fullWidth
+                label="Password"
+                type={showPassword ? 'text' : 'password'}
+                required
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Lock size={18} color={theme.palette.text.disabled} />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+
+              <Button
+                type="submit"
+                variant="contained"
+                size="large"
+                disabled={loading}
+                sx={{ py: 1.5, fontWeight: 700 }}
+              >
+                {loading ? <CircularProgress size={24} color="inherit" /> : 'Sign In'}
+              </Button>
+            </Stack>
+          </form>
+
+          <Typography variant="body2" sx={{ mt: 4, color: 'text.secondary' }}>
+            New to the portal? <Link to="/signup" style={{ color: theme.palette.primary.main, fontWeight: 700, textDecoration: 'none' }}>Create an account</Link>
+          </Typography>
+
+          <Divider sx={{ my: 4 }} />
+
+          <Button 
+              variant="text" 
+              size="small" 
+              startIcon={<AlertTriangle size={14} />}
+              onClick={async () => {
+                  localStorage.clear();
+                  await supabase.auth.signOut();
+                  window.location.reload();
+              }}
+              sx={{ color: 'text.disabled', fontSize: '0.75rem', fontWeight: 600 }}
+          >
+              Troubleshoot Session
+          </Button>
+        </Paper>
       </Container>
     </Box>
   );

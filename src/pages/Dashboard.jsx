@@ -8,6 +8,7 @@ import {
   Typography,
   Avatar,
   Button,
+  IconButton,
   useTheme,
   Skeleton,
   Stack,
@@ -15,19 +16,19 @@ import {
   alpha,
   Paper,
   Container,
-  CircularProgress
+  CircularProgress,
+  Card,
+  CardContent
 } from '@mui/material';
 import {
   Users,
   DollarSign,
   Calendar,
   ArrowRight,
-  Clock,
   Plus,
-  BookOpen,
-  Leaf,
-  Sparkles,
-  Sun
+  ArrowUpRight,
+  TrendingUp,
+  Activity
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { 
@@ -43,73 +44,36 @@ import {
 import { supabase } from '../supabase';
 import { safeParseDate } from '../utils/dateUtils';
 
-const PulseCard = ({ title, value, subValue, color }) => {
+const StatCard = ({ title, value, subValue, icon, color }) => {
+  const theme = useTheme();
+  const Icon = icon;
   return (
-    <Box
-      style={{ height: '100%' }}
-    >
-      <Paper 
-        elevation={0}
-        sx={{ 
-          p: { xs: 3, md: 4 },
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-          borderRadius: 8,
-          position: 'relative',
-          overflow: 'hidden',
-          bgcolor: 'background.paper',
-          border: `1px solid ${alpha(color, 0.1)}`,
-          boxShadow: `0 20px 40px -15px ${alpha(color, 0.08)}`,
-          transition: 'all 0.4s ease',
-          '&:hover': { 
-            transform: 'translateY(-10px)',
-            boxShadow: `0 30px 60px -15px ${alpha(color, 0.15)}`,
-            '& .icon-bg': { transform: 'scale(1.2) rotate(15deg)' }
-          }
-        }}
-      >
-        <Box 
-          className="icon-bg"
-          sx={{ 
-            position: 'absolute', top: -20, right: -20, opacity: 0.05, color: color,
-            transition: 'transform 0.6s ease',
-            pointerEvents: 'none'
-          }}
-        >
-        </Box>
-
-        <Box sx={{ position: 'relative', zIndex: 2 }}>
-          <Stack direction="row" spacing={2} sx={{ alignItems: "center", mb: 4 }}>
-            <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: alpha(color, 0.1), color: color }}>
-            </Box>
-            <Typography variant="subtitle2" color="text.secondary" fontWeight={900} sx={{ textTransform: 'uppercase', letterSpacing: 3, fontSize: '0.7rem' }}>
-              {title}
-            </Typography>
-          </Stack>
-          
-          <Typography variant="h2" sx={{ fontWeight: 400, color: 'text.primary', mb: 1, fontFamily: 'DM Serif Display' }}>
-            {value}
-          </Typography>
-          <Typography variant="body2" color="text.disabled" fontWeight={700}>
-            {subValue}
-          </Typography>
-        </Box>
-      </Paper>
-    </Box>
+    <Card elevation={0} sx={{ height: '100%', border: `1px solid ${theme.palette.divider}`, borderRadius: 3 }}>
+      <CardContent sx={{ p: 3 }}>
+        <Stack direction="row" spacing={2} sx={{ alignItems: 'center', mb: 2 }}>
+          <Box sx={{ p: 1, borderRadius: 2, bgcolor: alpha(color || theme.palette.primary.main, 0.1), color: color || theme.palette.primary.main }}>
+            <Icon size={20} />
+          </Box>
+          <Typography variant="body2" fontWeight={600} color="text.secondary">{title}</Typography>
+        </Stack>
+        <Typography variant="h4" fontWeight={800} sx={{ mb: 1 }}>{value}</Typography>
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+          <TrendingUp size={14} style={{ color: theme.palette.success.main }} />
+          <Typography variant="caption" fontWeight={600} color="success.main">{subValue}</Typography>
+        </Stack>
+      </CardContent>
+    </Card>
   );
 };
 
 const Dashboard = () => {
   const theme = useTheme();
   const { workspace, filterData } = useWorkspace();
-  const { isDeptHead, ROLES, effectiveRole } = useAuth();
+  const { isDeptHead } = useAuth();
   
-  // Members can't view financials or family stats
-  const canViewFinancials = isDeptHead; // RLS will handle scoping
+  const canViewFinancials = isDeptHead;
   const canViewFamily = isDeptHead; 
-  const isMember = effectiveRole === ROLES.MEMBER;
+  // isMember removed
   
   const [data, setData] = useState({
     members: [],
@@ -124,15 +88,15 @@ const Dashboard = () => {
       try {
         setLoading(true);
         const queries = [
-          supabase.from('events').select('*').gte('date', new Date().toISOString().split('T')[0]).order('date', { ascending: true }).limit(500),
-          supabase.from('bible_studies').select('*').limit(100),
+          supabase.from('events').select('*').gte('date', new Date().toISOString().split('T')[0]).order('date', { ascending: true }).limit(5),
+          supabase.from('bible_studies').select('*').limit(5),
         ];
 
         if (canViewFamily) {
-          queries.push(supabase.from('members').select('*').limit(2000));
+          queries.push(supabase.from('members').select('*').order('created_at', { ascending: false }).limit(5));
         }
         if (canViewFinancials) {
-          queries.push(supabase.from('transactions').select('*').order('date', { ascending: false }).limit(2000));
+          queries.push(supabase.from('transactions').select('*').order('date', { ascending: false }).limit(100));
         }
 
         const results = await Promise.all(queries);
@@ -170,79 +134,74 @@ const Dashboard = () => {
         acc[d] = (acc[d] || 0) + (Number(t.amount) || 0);
         return acc;
       }, {});
-    return Object.entries(incomeByDate).map(([name, amt]) => ({ name, amt })).slice(-10);
+    return Object.entries(incomeByDate).map(([name, amt]) => ({ name, amt })).slice(-7);
   }, [filteredData.transactions]);
 
   if (loading) return (
-    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
-      <CircularProgress color="primary" />
+    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+      <CircularProgress size={32} thickness={5} />
     </Box>
   );
 
   return (
-    <Box sx={{ pb: 6 }}>
-      {/* --- HERO --- */}
-      <Box sx={{ mb: { xs: 4, md: 6 }, position: 'relative' }}>
-        <Box>
-            <Stack direction="row" spacing={2} sx={{ alignItems: "center", mb: 1.5 }}>
-                <Box sx={{ p: 1, borderRadius: '50%', bgcolor: alpha(theme.palette.secondary.main, 0.1), color: theme.palette.secondary.main }}>
-                    <Sun size={20} />
-                </Box>
-                <Typography variant="overline" sx={{ fontWeight: 900, letterSpacing: 4, color: 'secondary.main' }}>
-                    {workspace === 'main' ? 'MAIN SANCTUARY' : workspace.toUpperCase()} PULSE
-                </Typography>
-            </Stack>
-            <Typography variant="h1" sx={{ fontSize: { xs: '2.5rem', md: '4.5rem' }, color: 'primary.main', mb: 2 }}>
-                Redeemed Transformation Chapel Int.
-            </Typography>
-            <Typography variant="h5" sx={{ fontStyle: 'italic', color: 'text.secondary', fontFamily: 'Lora', maxWidth: 700, lineHeight: 1.4, fontSize: { xs: '1.1rem', md: '1.5rem' } }}>
-                Gathered in grace, connected in love, and thriving in service.
-            </Typography>
-        </Box>
+    <Box>
+      {/* Header Section */}
+      <Box sx={{ mb: 6 }}>
+        <Typography variant="h2" sx={{ mb: 1 }}>Welcome back,</Typography>
+        <Typography variant="body1" color="text.secondary">
+          Here's what's happening in the {workspace === 'main' ? 'Main Sanctuary' : workspace} today.
+        </Typography>
       </Box>
 
-      {/* --- METRICS --- */}
-      <Grid container spacing={3} sx={{ mb: { xs: 6, md: 8 } }}>
+      {/* Stats Grid */}
+      <Grid container spacing={3} sx={{ mb: 6 }}>
         {canViewFamily && (
-          <Grid size={{ xs: 12, md: 4 }}>
-            <PulseCard title="The Family" value={filteredData.members.length.toLocaleString()} subValue="Souls in the registry" color={theme.palette.primary.main} delay={0.1} />
+          <Grid item xs={12} sm={6} md={3}>
+            <StatCard title="Total Members" value={filteredData.members.length.toLocaleString()} subValue="+12% from last month" icon={Users} color={theme.palette.primary.main} />
           </Grid>
         )}
         {canViewFinancials && (
-          <Grid size={{ xs: 12, md: 4 }}>
-            <PulseCard title="Stewardship" value={`GHC ${totalFunds.toLocaleString()}`} subValue="Congregational seeds" color={theme.palette.secondary.main} delay={0.2} />
+          <Grid item xs={12} sm={6} md={3}>
+            <StatCard title="Total Giving" value={`GHC ${totalFunds.toLocaleString()}`} subValue="+5.4% from last week" icon={DollarSign} color={theme.palette.success.main} />
           </Grid>
         )}
-        <Grid size={{ xs: 12, md: canViewFamily && canViewFinancials ? 4 : 6 }}>
-          <PulseCard title="Gatherings" value={filteredData.events.length} subValue="Moments of fellowship" color="#D48166" delay={0.3} />
+        <Grid item xs={12} sm={6} md={StatCard ? 3 : 6}>
+          <StatCard title="Upcoming Events" value={filteredData.events.length} subValue="Next 7 days" icon={Calendar} color={theme.palette.info.main} />
         </Grid>
-        {isMember && (
-          <Grid size={{ xs: 12, md: 6 }}>
-            <PulseCard title="Library" value={filteredData.bibleStudies.length} subValue="Spiritual resources" color={theme.palette.info.main} delay={0.4} />
-          </Grid>
-        )}
+        <Grid item xs={12} sm={6} md={StatCard ? 3 : 6}>
+          <StatCard title="System Health" value="Active" subValue="All services online" icon={Activity} color={theme.palette.secondary.main} />
+        </Grid>
       </Grid>
 
       <Grid container spacing={4}>
-        {/* --- CHART --- */}
+        {/* Main Chart Area */}
         {canViewFinancials && chartData.length > 0 && (
-          <Grid size={{ xs: 12, lg: 7 }}>
-            <Typography variant="h4" sx={{ mb: 3, fontFamily: 'DM Serif Display' }}>Abundance Trajectory</Typography>
-            <Paper elevation={0} sx={{ p: { xs: 2, md: 4 }, borderRadius: 8, border: `1px solid ${theme.palette.divider}`, bgcolor: alpha(theme.palette.primary.main, 0.01) }}>
-              <Box sx={{ height: { xs: 300, md: 400 }, width: '100%' }}>
+          <Grid item xs={12} lg={8}>
+            <Paper elevation={0} sx={{ p: 4, borderRadius: 3, border: `1px solid ${theme.palette.divider}` }}>
+              <Stack direction="row" spacing={2} sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+                <Box>
+                  <Typography variant="h6" fontWeight={800}>Giving Overview</Typography>
+                  <Typography variant="caption" color="text.secondary">Financial trajectory for the current period</Typography>
+                </Box>
+                <Button size="small" endIcon={<ArrowUpRight size={16} />}>View Report</Button>
+              </Stack>
+              <Box sx={{ height: 350, width: '100%' }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={chartData}>
                     <defs>
-                      <linearGradient id="vGrad" x1="0" y1="0" x2="0" y2="1">
+                      <linearGradient id="colorAmt" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor={theme.palette.primary.main} stopOpacity={0.1}/>
                         <stop offset="95%" stopColor={theme.palette.primary.main} stopOpacity={0}/>
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={alpha(theme.palette.primary.main, 0.1)} />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fontWeight: 800, fill: theme.palette.text.disabled }} />
-                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fontWeight: 800, fill: theme.palette.text.disabled }} />
-                    <Tooltip contentStyle={{ borderRadius: 8, border: `1px solid ${theme.palette.divider}` }} />
-                    <Area type="monotone" dataKey="amt" stroke={theme.palette.primary.main} strokeWidth={3} fillOpacity={1} fill="url(#vGrad)" />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={theme.palette.divider} />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fontWeight: 600, fill: theme.palette.text.secondary }} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fontWeight: 600, fill: theme.palette.text.secondary }} />
+                    <Tooltip 
+                      contentStyle={{ borderRadius: 12, border: 'none', boxShadow: theme.shadows[3], padding: '12px' }}
+                      itemStyle={{ fontWeight: 700, fontSize: '14px' }}
+                    />
+                    <Area type="monotone" dataKey="amt" stroke={theme.palette.primary.main} strokeWidth={3} fillOpacity={1} fill="url(#colorAmt)" />
                   </AreaChart>
                 </ResponsiveContainer>
               </Box>
@@ -250,53 +209,56 @@ const Dashboard = () => {
           </Grid>
         )}
 
-        {/* --- FAMILY FEED --- */}
-        {canViewFamily && (
-          <Grid size={{ xs: 12, lg: canViewFinancials ? 5 : 12 }}>
-            <Stack direction="row" spacing={2} sx={{ justifyContent: "space-between", alignItems: "flex-end", mb: 5 }}>
+        {/* Side Feed */}
+        <Grid item xs={12} lg={canViewFinancials ? 4 : 12}>
+          <Stack spacing={4}>
+            {/* Recent Members */}
+            {canViewFamily && (
               <Box>
-                  <Typography variant="h4" sx={{ fontFamily: 'DM Serif Display' }}>New Souls</Typography>
-                  <Typography variant="body2" color="text.secondary">Recent family registrations.</Typography>
+                <Stack direction="row" spacing={2} sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                  <Typography variant="h6" fontWeight={800}>Recent Members</Typography>
+                  <Button component={Link} to="/members" size="small">See All</Button>
+                </Stack>
+                <Stack spacing={2}>
+                  {filteredData.members.map((m) => (
+                    <Paper key={m.id} elevation={0} sx={{ p: 2, borderRadius: 2, border: `1px solid ${theme.palette.divider}`, display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <Avatar sx={{ width: 40, height: 40, bgcolor: alpha(theme.palette.primary.main, 0.1), color: 'primary.main', fontWeight: 700, fontSize: '0.85rem' }}>
+                        {m.name?.charAt(0)}
+                      </Avatar>
+                      <Box sx={{ flexGrow: 1 }}>
+                        <Typography variant="body2" fontWeight={700}>{m.name}</Typography>
+                        <Typography variant="caption" color="text.secondary">{m.department || 'General'}</Typography>
+                      </Box>
+                      <IconButton size="small"><ArrowRight size={16} /></IconButton>
+                    </Paper>
+                  ))}
+                </Stack>
               </Box>
-              <Button component={Link} to="/members" sx={{ fontWeight: 800 }}>View All</Button>
-            </Stack>
-            <Grid container spacing={3}>
-              {filteredData.members.slice(0, canViewFinancials ? 4 : 8).map((m) => (
-                  <Grid size={{ xs: 12, md: canViewFinancials ? 12 : 6 }} key={m.id}>
-                      <Paper elevation={0} sx={{ p: 3, borderRadius: 4, display: 'flex', alignItems: 'center', gap: 3, border: `1px solid ${theme.palette.divider}` }}>
-                          <Avatar sx={{ bgcolor: alpha(theme.palette.primary.main, 0.05), color: theme.palette.primary.main, fontWeight: 900 }}>{m.name?.charAt(0)}</Avatar>
-                          <Box sx={{ flexGrow: 1 }}><Typography variant="body1" fontWeight={800}>{m.name}</Typography><Typography variant="caption" color="text.disabled">{m.department || 'General'}</Typography></Box>
-                          <ArrowRight size={16} color={theme.palette.text.disabled} />
-                      </Paper>
-                  </Grid>
-              ))}
-            </Grid>
-          </Grid>
-        )}
-        
-        {/* --- EVENTS FEED FOR MEMBERS --- */}
-        {isMember && (
-          <Grid size={{ xs: 12 }}>
-            <Stack direction="row" spacing={2} sx={{ justifyContent: "space-between", alignItems: "flex-end", mb: 5 }}>
-              <Box>
-                  <Typography variant="h4" sx={{ fontFamily: 'DM Serif Display' }}>Upcoming Gatherings</Typography>
-                  <Typography variant="body2" color="text.secondary">Fellowship moments for your growth.</Typography>
-              </Box>
-              <Button component={Link} to="/events" sx={{ fontWeight: 800 }}>View All</Button>
-            </Stack>
-            <Grid container spacing={3}>
-              {filteredData.events.slice(0, 6).map((e) => (
-                  <Grid size={{ xs: 12, md: 4 }} key={e.id}>
-                      <Paper elevation={0} sx={{ p: 3, borderRadius: 4, border: `1px solid ${theme.palette.divider}` }}>
-                          <Typography variant="subtitle2" fontWeight={900} color="primary.main" sx={{ mb: 1 }}>{format(safeParseDate(e.date), 'MMM dd, yyyy')}</Typography>
-                          <Typography variant="body1" fontWeight={800}>{e.name}</Typography>
-                          <Typography variant="caption" color="text.disabled">{e.location}</Typography>
-                      </Paper>
-                  </Grid>
-              ))}
-            </Grid>
-          </Grid>
-        )}
+            )}
+
+            {/* Upcoming Events */}
+            <Box>
+              <Stack direction="row" spacing={2} sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                <Typography variant="h6" fontWeight={800}>Upcoming Events</Typography>
+                <Button component={Link} to="/events" size="small">View Calendar</Button>
+              </Stack>
+              <Stack spacing={2}>
+                {filteredData.events.map((e) => (
+                  <Paper key={e.id} elevation={0} sx={{ p: 2, borderRadius: 2, border: `1px solid ${theme.palette.divider}`, display: 'flex', gap: 2 }}>
+                    <Box sx={{ width: 48, height: 48, borderRadius: 2, bgcolor: alpha(theme.palette.secondary.main, 0.1), color: 'secondary.main', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <Typography variant="caption" fontWeight={800} sx={{ lineHeight: 1 }}>{format(safeParseDate(e.date), 'MMM')}</Typography>
+                      <Typography variant="body2" fontWeight={900}>{format(safeParseDate(e.date), 'dd')}</Typography>
+                    </Box>
+                    <Box>
+                      <Typography variant="body2" fontWeight={700}>{e.name}</Typography>
+                      <Typography variant="caption" color="text.secondary">{e.location}</Typography>
+                    </Box>
+                  </Paper>
+                ))}
+              </Stack>
+            </Box>
+          </Stack>
+        </Grid>
       </Grid>
     </Box>
   );

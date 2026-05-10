@@ -7,19 +7,18 @@ import {
   Button, 
   useTheme, 
   alpha, 
-  Container, 
   Paper,
   Stack,
-  CircularProgress
+  CircularProgress,
+  Card,
+  CardContent
 } from '@mui/material';
 import { 
   Users, 
   DollarSign, 
   Calendar, 
   FileText,
-  Download,
-  FileSpreadsheet,
-  FileCode
+  FileSpreadsheet
 } from 'lucide-react';
 
 import { supabase } from '../supabase';
@@ -43,7 +42,7 @@ const Reports = () => {
       const data = filterData(rawData || []);
       
       if (!data || data.length === 0) {
-        showNotification("No data to report.", "warning");
+        showNotification("No data available for reporting in this scope.", "warning");
         return;
       }
 
@@ -59,62 +58,66 @@ const Reports = () => {
         XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
         XLSX.writeFile(wb, `${fileName}.xlsx`);
       }
-      showNotification("Report generated.");
+      showNotification("Report generated and downloaded.");
     } catch (e) { 
         console.error(e);
         showNotification("Failed to generate report.", "error"); 
-    }
-    finally { setGenerating(null); }
+    } finally { setGenerating(null); }
   };
 
+  const reportTypes = [
+    { id: 'members', title: 'Member Registry', description: 'Comprehensive list of all registered congregation members and their details.', icon: Users, color: theme.palette.primary.main },
+    { id: 'financial', title: 'Financial Ledger', description: 'Audit-ready logs of all contributions and ministerial expenditures.', icon: DollarSign, color: theme.palette.success.main },
+    { id: 'attendance', title: 'Attendance Logs', description: 'Historical data of service participation and congregation growth.', icon: Calendar, color: theme.palette.info.main }
+  ];
+
   return (
-    <Box sx={{ pb: 10 }}>
-      <Box sx={{ mb: 8 }}>
-        <Typography variant="overline" color="primary" fontWeight={800} letterSpacing={3}>AUDIT & GOVERNANCE</Typography>
-        <Typography variant="h2" sx={{ fontWeight: 900, mt: 1 }}>Executive Reports</Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ mt: 2, maxWidth: 600 }}>
-             Formal documentation for ministerial review, financial audits, and organizational planning.
-        </Typography>
+    <Box>
+      <Box sx={{ mb: 6 }}>
+        <Typography variant="h2">Audit Reports</Typography>
+        <Typography variant="body1" color="text.secondary">Formal documentation for ministerial review and organizational planning.</Typography>
       </Box>
 
       <Grid container spacing={4}>
-        {[
-            { id: 'members', title: 'Congregation Registry', icon: Users, color: theme.palette.primary.main },
-            { id: 'financial', title: 'Financial Ledger', icon: DollarSign, color: theme.palette.success.main },
-            { id: 'attendance', title: 'Service Participation', icon: Calendar, color: theme.palette.warning.main }
-        ].map((r) => (
-            <Grid size={{ xs: 12, md: 4 }} key={r.id}>
-                <Paper elevation={0} sx={{ p: 6, borderRadius: 0, border: `1px solid ${theme.palette.divider}`, height: '100%', textAlign: 'center' }}>
-                    <Box sx={{ 
-                        width: 80, height: 80, borderRadius: 0, 
-                        bgcolor: alpha(r.color, 0.05), color: r.color, 
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        mx: 'auto', mb: 4
-                    }}>
-                        <r.icon size={32} />
-                    </Box>
-                    <Typography variant="h5" fontWeight={900} gutterBottom sx={{ fontFamily: 'Merriweather' }}>{r.title}</Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 6, fontFamily: 'Lora' }}>Export comprehensive logs for the current environment in standardized formats.</Typography>
-                    
-                    <Stack spacing={2}>
-                        <Button 
-                            fullWidth variant="contained" 
-                            disabled={!!generating}
-                            startIcon={generating === `${r.id}-pdf` ? <CircularProgress size={16} color="inherit" /> : <FileText size={16}/>}
-                            onClick={() => downloadReport(r.id, 'pdf')}
-                        >
-                            PDF Document
-                        </Button>
-                        <Button 
-                            fullWidth variant="outlined" 
-                            disabled={!!generating}
-                            startIcon={generating === `${r.id}-excel` ? <CircularProgress size={16} /> : <FileSpreadsheet size={16}/>}
-                            onClick={() => downloadReport(r.id, 'excel')}
-                        >
-                            Excel Spreadsheet
-                        </Button>
-                    </Stack>
-                </Paper>
+        {reportTypes.map((r) => (
+            <Grid item xs={12} md={4} key={r.id}>
+                <Card elevation={0} sx={{ height: '100%', border: `1px solid ${theme.palette.divider}`, borderRadius: 3 }}>
+                    <CardContent sx={{ p: 4, textAlign: 'center' }}>
+                        <Box sx={{ 
+                            width: 64, height: 64, borderRadius: 2, 
+                            bgcolor: alpha(r.color, 0.08), color: r.color, 
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            mx: 'auto', mb: 3
+                        }}>
+                            <r.icon size={28} />
+                        </Box>
+                        <Typography variant="h6" fontWeight={800} sx={{ mb: 1.5 }}>{r.title}</Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 4, minHeight: 60 }}>
+                            {r.description}
+                        </Typography>
+                        
+                        <Stack spacing={2}>
+                            <Button 
+                                fullWidth variant="contained" 
+                                size="small"
+                                disabled={!!generating}
+                                startIcon={generating === `${r.id}-pdf` ? <CircularProgress size={16} color="inherit" /> : <FileText size={16}/>}
+                                onClick={() => downloadReport(r.id, 'pdf')}
+                            >
+                                Download PDF
+                            </Button>
+                            <Button 
+                                fullWidth variant="outlined" 
+                                size="small"
+                                disabled={!!generating}
+                                startIcon={generating === `${r.id}-excel` ? <CircularProgress size={16} /> : <FileSpreadsheet size={16}/>}
+                                onClick={() => downloadReport(r.id, 'excel')}
+                            >
+                                Download Excel
+                            </Button>
+                        </Stack>
+                    </CardContent>
+                </Card>
             </Grid>
         ))}
       </Grid>

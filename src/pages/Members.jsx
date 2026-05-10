@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { format } from 'date-fns';
-import { safeParseDate } from '../utils/dateUtils';
 import { useWorkspace } from '../context/WorkspaceContext';
 import { useAuth } from '../context/AuthContext';
 import { 
@@ -17,64 +15,71 @@ import {
   alpha,
   Paper,
   Stack,
-  Divider
+  Divider,
+  IconButton,
+  InputAdornment
 } from '@mui/material';
 import { 
   UserPlus, 
   Search, 
   Mail, 
   Phone, 
-  Leaf
+  MoreHorizontal,
+  Filter,
+  ArrowUpDown
 } from 'lucide-react';
 import AddMemberDialog from '../components/AddMemberDialog';
 import MemberDetailsDialog from '../components/MemberDetailsDialog';
 
 import { supabase } from '../supabase';
 
-const FamilyCard = ({ member, onClick }) => {
+const MemberTableRow = ({ member, onClick }) => {
     const theme = useTheme();
     return (
         <Paper 
             elevation={0}
             onClick={onClick}
             sx={{ 
-                p: { xs: 2.5, md: 3 }, borderRadius: 6, cursor: 'pointer',
+                p: 2, borderRadius: 2, cursor: 'pointer',
                 border: `1px solid ${theme.palette.divider}`,
                 bgcolor: 'background.paper',
-                transition: 'all 0.3s ease',
-                position: 'relative',
-                overflow: 'hidden',
-                '&:hover': { borderColor: theme.palette.primary.main, transform: 'translateY(-5px)', boxShadow: '0 12px 30px -10px rgba(74, 103, 65, 0.15)' }
+                transition: 'all 0.2s ease',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 3,
+                '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.02), borderColor: theme.palette.primary.main }
             }}
         >
-            <Box sx={{ position: 'absolute', top: -10, right: -10, opacity: 0.03, color: 'primary.main' }}>
-                <Leaf size={100} />
+            <Avatar sx={{ width: 44, height: 44, bgcolor: alpha(theme.palette.primary.main, 0.05), color: 'primary.main', fontWeight: 700 }}>
+                {member.name?.charAt(0)}
+            </Avatar>
+            
+            <Box sx={{ flex: 2, minWidth: 0 }}>
+                <Typography variant="body2" fontWeight={700} noWrap>{member.name}</Typography>
+                <Typography variant="caption" color="text.secondary" noWrap>{member.email || 'No email'}</Typography>
             </Box>
-            <Stack direction="row" spacing={2} sx={{ alignItems: "center", mb: 2 }}>
-                <Avatar sx={{ width: 48, height: 48, borderRadius: 3, bgcolor: alpha(theme.palette.primary.main, 0.05), color: theme.palette.primary.main, fontWeight: 900, fontSize: '1.2rem' }}>
-                    {member.name?.charAt(0)}
-                </Avatar>
-                <Box>
-                    <Typography variant="h6" fontWeight={800} sx={{ fontSize: '1rem' }}>{member.name}</Typography>
-                    <Typography variant="caption" color="text.secondary" fontWeight={700} sx={{ letterSpacing: 1 }}>{member.department || 'General'}</Typography>
-                </Box>
-            </Stack>
-            
-            <Stack spacing={1} sx={{ color: 'text.secondary' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    <Mail size={12} /> <Typography variant="caption" fontWeight={600}>{member.email || 'No email registered'}</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    <Phone size={12} /> <Typography variant="caption" fontWeight={600}>{member.phone || 'No phone registered'}</Typography>
-                </Box>
-            </Stack>
-            
-            <Divider sx={{ my: 2, borderStyle: 'dashed' }} />
-            
-            <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "center" }}>
-                <Chip label={member.status || 'Active'} size="small" sx={{ borderRadius: 2, fontWeight: 900, fontSize: '0.6rem', bgcolor: alpha(theme.palette.primary.main, 0.05), color: 'primary.main' }} />
-                <Typography variant="caption" fontWeight={800} color="text.disabled">EST. {member.created_at ? format(safeParseDate(member.created_at), 'yyyy') : '2026'}</Typography>
-            </Stack>
+
+            <Box sx={{ flex: 1.5, display: { xs: 'none', md: 'block' } }}>
+                <Typography variant="caption" color="text.disabled" sx={{ textTransform: 'uppercase', fontWeight: 800, letterSpacing: 0.5 }}>Department</Typography>
+                <Typography variant="body2" fontWeight={600} noWrap>{member.department || 'General'}</Typography>
+            </Box>
+
+            <Box sx={{ flex: 1, display: { xs: 'none', lg: 'block' } }}>
+                <Typography variant="caption" color="text.disabled" sx={{ textTransform: 'uppercase', fontWeight: 800, letterSpacing: 0.5 }}>Phone</Typography>
+                <Typography variant="body2" fontWeight={600} noWrap>{member.phone || 'N/A'}</Typography>
+            </Box>
+
+            <Box sx={{ flex: 1, display: { xs: 'none', sm: 'block' }, textAlign: 'right' }}>
+                <Chip 
+                    label={member.status || 'Active'} 
+                    size="small" 
+                    sx={{ borderRadius: 1, fontWeight: 700, fontSize: '0.65rem', textTransform: 'uppercase' }} 
+                    color={member.status === 'active' ? 'success' : 'default'}
+                    variant="soft"
+                />
+            </Box>
+
+            <IconButton size="small"><MoreHorizontal size={18} /></IconButton>
         </Paper>
     );
 };
@@ -185,44 +190,55 @@ const Members = () => {
   };
 
   return (
-    <Box sx={{ pb: 6 }}>
-      <Box sx={{ mb: { xs: 4, md: 6 } }}>
-        <Typography variant="overline" color="primary" fontWeight={800} letterSpacing={3}>THE CONGREGATION</Typography>
-        <Typography variant="h2" sx={{ fontWeight: 900, mt: 1, fontSize: { xs: '2rem', md: '3rem' } }}>Family Directory</Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ mt: 1.5, maxWidth: 600, fontSize: '1rem' }}>
-             A beautiful record of every soul connected to the Redeemed Transformation Chapel International family.        </Typography>
-      </Box>
-
-      <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} sx={{ mb: { xs: 4, md: 6 }, alignItems: "center" }}>
-          <Paper elevation={0} sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', p: 0.75, borderRadius: 100, border: `1px solid ${theme.palette.divider}`, px: 2.5, width: '100%' }}>
-            <Search size={18} color={theme.palette.text.disabled} />
-            <TextField 
-                fullWidth variant="standard" placeholder="Find a family member..." 
-                value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
-                slotProps={{ input: { disableUnderline: true, sx: { px: 1.5, py: 0.75, fontFamily: 'Lora', fontWeight: 500 } } }} 
-            />
-          </Paper>
-          {isDeptHead && (
-            <Button variant="contained" startIcon={<UserPlus size={18}/>} onClick={() => setOpenAddMemberDialog(true)} sx={{ height: 50, px: 4, borderRadius: 100 }}>Register Soul</Button>
-          )}
+    <Box>
+      {/* Header */}
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} sx={{ justifyContent: 'space-between', alignItems: { sm: 'center' }, mb: 6 }}>
+        <Box>
+            <Typography variant="h2">Member Directory</Typography>
+            <Typography variant="body1" color="text.secondary">Manage and view all registered members of the congregation.</Typography>
+        </Box>
+        {isDeptHead && (
+          <Button variant="contained" startIcon={<UserPlus size={18}/>} onClick={() => setOpenAddMemberDialog(true)}>Register Member</Button>
+        )}
       </Stack>
 
+      {/* Toolbar */}
+      <Paper elevation={0} sx={{ p: 2, mb: 4, borderRadius: 3, border: `1px solid ${theme.palette.divider}`, display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
+        <TextField 
+            size="small"
+            placeholder="Search members..." 
+            value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
+            sx={{ flexGrow: 1, minWidth: 200 }}
+            InputProps={{
+                startAdornment: (
+                    <InputAdornment position="start">
+                        <Search size={18} style={{ color: theme.palette.text.disabled }} />
+                    </InputAdornment>
+                ),
+            }}
+        />
+        <Button variant="outlined" startIcon={<Filter size={16} />} size="small">Filter</Button>
+        <Button variant="outlined" startIcon={<ArrowUpDown size={16} />} size="small">Sort</Button>
+      </Paper>
+
+      {/* List */}
       {loading && members.length === 0 ? (
-        <Grid container spacing={4}>
-          {[1, 2, 3].map((i) => (
-            <Grid size={{ xs: 12, md: 6, lg: 4 }} key={i}>
-              <Skeleton variant="rectangular" height={250} sx={{ borderRadius: 6 }} />
-            </Grid>
+        <Stack spacing={2}>
+          {[1, 2, 3, 4, 5].map((i) => (
+            <Skeleton key={i} variant="rectangular" height={80} sx={{ borderRadius: 2 }} />
           ))}
-        </Grid>
+        </Stack>
       ) : (
-          <Grid container spacing={4}>
+          <Stack spacing={2}>
               {filteredMembers.map((m) => (
-                  <Grid size={{ xs: 12, md: 6, lg: 4 }} key={m.id}>
-                      <FamilyCard member={m} onClick={() => setSelectedMember(m)} />
-                  </Grid>
+                  <MemberTableRow key={m.id} member={m} onClick={() => setSelectedMember(m)} />
               ))}
-          </Grid>
+              {filteredMembers.length === 0 && (
+                  <Box sx={{ py: 10, textAlign: 'center' }}>
+                      <Typography variant="body1" color="text.disabled">No members found matching your search.</Typography>
+                  </Box>
+              )}
+          </Stack>
       )}
 
       <AddMemberDialog 
