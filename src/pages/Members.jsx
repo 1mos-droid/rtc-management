@@ -131,9 +131,15 @@ const Members = () => {
   const handleAddMember = async (newMember) => {
     if (!isDeptHead) return;
     try {
+      const { name, email, phone, address, dob, membershipType } = newMember;
+      
       const { error } = await supabase
         .from('members')
-        .insert([{ ...newMember }]);
+        .insert([{ 
+            name, email, phone, address, dob, 
+            membership_type: membershipType,
+            status: 'active'
+        }]);
       
       if (error) throw error;
 

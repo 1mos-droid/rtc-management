@@ -126,10 +126,9 @@ const Financials = () => {
       const txDepartment = (effectiveRole === ROLES.DEPARTMENT_HEAD) ? user.department : null;
       
       const txData = { 
-        ...formData, 
+        amount: Number(formData.amount),
         description: sanitizedDescription,
-        amount: Number(formData.amount), 
-        department: txDepartment,
+        type: formData.type,
         date: editingTransaction ? editingTransaction.date : new Date().toISOString() 
       };
 

@@ -87,13 +87,14 @@ const Events = () => {
     if (!formData.name || !formData.date) return showNotification("Please provide at least a name and date.", "warning");
     setSubmitting(true);
     try {
-      // If user is Dept Head (and not Admin/Dev), assign their department
-      const eventDepartment = (effectiveRole === ROLES.DEPARTMENT_HEAD) ? user.department : null;
+      const { name, date, time, location, isOnline } = formData;
       
       const { error } = await supabase.from('events').insert([{
-        ...formData,
-        date: new Date(formData.date).toISOString(),
-        department: eventDepartment
+        name,
+        time,
+        location,
+        is_online: isOnline,
+        date: new Date(date).toISOString()
       }]);
       
       if (error) throw error;
@@ -210,10 +211,10 @@ const Events = () => {
               <TextField fullWidth label="Event Title" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} variant="outlined" />
               <Grid container spacing={2}>
                   <Grid size={{ xs: 6 }}>
-                      <TextField fullWidth type="date" label="Date" value={formData.date} onChange={(e) => setFormData({...formData, date: e.target.value})} InputLabelProps={{ shrink: true }} />
+                      <TextField fullWidth type="date" label="Date" value={formData.date} onChange={(e) => setFormData({...formData, date: e.target.value})} slotProps={{ inputLabel: { shrink: true } }} />
                   </Grid>
                   <Grid size={{ xs: 6 }}>
-                      <TextField fullWidth type="time" label="Time" value={formData.time} onChange={(e) => setFormData({...formData, time: e.target.value})} InputLabelProps={{ shrink: true }} />
+                      <TextField fullWidth type="time" label="Time" value={formData.time} onChange={(e) => setFormData({...formData, time: e.target.value})} slotProps={{ inputLabel: { shrink: true } }} />
                   </Grid>
               </Grid>
               <TextField fullWidth label="Location / Virtual Link" value={formData.location} onChange={(e) => setFormData({...formData, location: e.target.value})} />

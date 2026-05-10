@@ -98,8 +98,7 @@ const Attendance = () => {
 
       const { error } = await supabase.from('attendance').insert([{
         date: new Date(selectedDate).toISOString(),
-        attendees,
-        department: attDepartment
+        attendees
       }]);
       
       if (error) throw error;

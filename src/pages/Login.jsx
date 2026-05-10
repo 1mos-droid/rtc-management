@@ -198,6 +198,22 @@ const Login = () => {
             <Typography variant="body2" sx={{ mt: 4, color: 'text.secondary' }}>
               New to the ministry? <Link to="/signup" style={{ color: theme.palette.primary.main, fontWeight: 800, textDecoration: 'none' }}>Register with the Chapel</Link>
             </Typography>
+
+            <Divider sx={{ my: 4, opacity: 0.5 }}>OR</Divider>
+
+            <Button 
+                variant="text" 
+                size="small" 
+                startIcon={<AlertTriangle size={14} />}
+                onClick={async () => {
+                    localStorage.clear();
+                    await supabase.auth.signOut();
+                    window.location.reload();
+                }}
+                sx={{ color: 'text.disabled', fontSize: '0.7rem', fontWeight: 700 }}
+            >
+                Troubleshoot Session (Force Clear)
+            </Button>
           </Paper>
         </Box>
       </Container>

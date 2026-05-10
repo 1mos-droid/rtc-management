@@ -13,11 +13,21 @@ export const AuthProvider = ({ children }) => {
 
     try {
       // Check if profile exists
-      const { data: profile } = await supabase
+      const { data: profile, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', authUser.id)
         .maybeSingle();
+
+      if (error) {
+        // If we get an unauthorized error here, the session is likely dead
+        if (error.code === 'PGRST301' || error.message?.toLowerCase().includes('jwt')) {
+          console.warn("🔐 Session invalid or expired. Signing out.");
+          await supabase.auth.signOut();
+          return null;
+        }
+        throw error;
+      }
 
       if (!profile) {
         console.log("🛠️ Creating profile for new user...");
@@ -51,6 +61,11 @@ export const AuthProvider = ({ children }) => {
     try {
       const profile = await ensureProfileSync(authUser);
       
+      // If profile sync failed critically (e.g. 401), don't return partial data
+      if (!profile && authUser) {
+        return null;
+      }
+
       return {
         id: authUser.id,
         email: authUser.email,
@@ -60,6 +75,7 @@ export const AuthProvider = ({ children }) => {
       };
     } catch (err) {
       console.error("Failed to fetch user metadata:", err);
+      // Only fallback if it's a non-critical error
       return { 
         id: authUser.id, 
         email: authUser.email, 
@@ -91,27 +107,56 @@ export const AuthProvider = ({ children }) => {
     let mounted = true;
 
     const initAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (mounted) {
-        if (session?.user) {
-          const combinedUser = await fetchUserMetadata(session.user);
-          setUser(combinedUser);
-        } else {
-          setUser(null);
+      // Safety timeout: if auth takes > 8s, we force loading to false to avoid "stuck" UI
+      const timeout = setTimeout(() => {
+        if (mounted && loading) {
+          console.warn("⚠️ Auth initialization timed out. Forcing UI state.");
+          setLoading(false);
         }
-        setLoading(false);
+      }, 8000);
+
+      try {
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError) throw sessionError;
+
+        if (mounted) {
+          if (session?.user) {
+            const combinedUser = await fetchUserMetadata(session.user);
+            setUser(combinedUser);
+            // If combinedUser is null, ensureProfileSync already handled the signOut
+          } else {
+            setUser(null);
+          }
+        }
+      } catch (e) {
+        console.error("🛑 Auth initialization failed:", e);
+        if (mounted) setUser(null);
+      } finally {
+        clearTimeout(timeout);
+        if (mounted) setLoading(false);
       }
     };
 
     initAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log(`🔑 Auth Event: ${event}`);
+      
+      if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+        if (mounted) {
+          setUser(null);
+          setLoading(false);
+        }
+        return;
+      }
+
       if (session?.user) {
         const combinedUser = await fetchUserMetadata(session.user);
         if (mounted) setUser(combinedUser);
       } else {
         if (mounted) setUser(null);
       }
+      
       if (mounted) setLoading(false);
     });
 

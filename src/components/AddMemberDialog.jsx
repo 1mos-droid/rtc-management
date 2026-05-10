@@ -36,7 +36,7 @@ const AddMemberDialog = ({ open, onClose, onAddMember }) => {
   
   const [formData, setFormData] = useState({
     name: '', email: '', phone: '', address: '', dob: '', 
-    department: '', position: '', membershipType: 'Member',
+    department: '', membershipType: 'Member',
   });
 
   const [errors, setErrors] = useState({});
@@ -75,7 +75,7 @@ const AddMemberDialog = ({ open, onClose, onAddMember }) => {
     <Dialog 
       open={open} 
       onClose={onClose}
-      TransitionComponent={Transition}
+      slots={{ transition: Transition }}
       fullWidth
       maxWidth="sm"
       slotProps={{ paper: { sx: { borderRadius: 0, p: 4 } } }}
@@ -103,7 +103,7 @@ const AddMemberDialog = ({ open, onClose, onAddMember }) => {
                 <TextField fullWidth label="Residential Address" name="address" value={formData.address} onChange={handleChange} variant="outlined" />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField fullWidth label="Date of Birth" name="dob" type="date" value={formData.dob} onChange={handleChange} InputLabelProps={{ shrink: true }} variant="outlined" />
+                <TextField fullWidth label="Date of Birth" name="dob" type="date" value={formData.dob} onChange={handleChange} slotProps={{ inputLabel: { shrink: true } }} variant="outlined" />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
                 <FormControl fullWidth>

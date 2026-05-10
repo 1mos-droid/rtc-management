@@ -60,7 +60,7 @@ const MemberDetailsDialog = ({ open, onClose, member, onEdit, onDelete }) => {
   
   const [formData, setFormData] = useState({
     name: '', email: '', phone: '', address: '', dob: '', 
-    status: '', department: '', position: ''    
+    status: '', department: ''    
   });
 
   useEffect(() => {
@@ -73,8 +73,7 @@ const MemberDetailsDialog = ({ open, onClose, member, onEdit, onDelete }) => {
         address: member.address || '',
         dob: member.dob || '', 
         status: member.status || 'active',
-        department: member.department || '', 
-        position: member.position || ''      
+        department: member.department || ''      
       });
       setIsEditing(false);
       setTabValue(0);
@@ -128,7 +127,7 @@ const MemberDetailsDialog = ({ open, onClose, member, onEdit, onDelete }) => {
     <Dialog
       open={open}
       onClose={onClose}
-      TransitionComponent={Transition}
+      slots={{ transition: Transition }}
       fullWidth
       maxWidth="md"
       slotProps={{ paper: { sx: { borderRadius: 0, overflow: 'hidden' } } }}
