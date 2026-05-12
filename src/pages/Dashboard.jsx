@@ -186,7 +186,7 @@ const Dashboard = () => {
                 <Button size="small" endIcon={<ArrowUpRight size={16} />}>View Report</Button>
               </Stack>
               <Box sx={{ height: 350, width: '100%' }}>
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                   <AreaChart data={chartData}>
                     <defs>
                       <linearGradient id="colorAmt" x1="0" y1="0" x2="0" y2="1">

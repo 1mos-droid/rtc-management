@@ -66,7 +66,7 @@ const Graph = () => {
               <Paper elevation={0} sx={{ p: 6, borderRadius: 0, border: `1px solid ${theme.palette.divider}`, bgcolor: alpha(theme.palette.primary.main, 0.01) }}>
                   <Typography variant="h5" fontWeight={900} sx={{ mb: 4, fontFamily: 'Merriweather' }}>Engagement Trajectory</Typography>
                   <Box sx={{ height: 400, width: '100%' }}>
-                      <ResponsiveContainer width="100%" height="100%">
+                      <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                           <AreaChart data={chartData}>
                               <defs>
                                   <linearGradient id="colorAtt" x1="0" y1="0" x2="0" y2="1">
@@ -89,7 +89,7 @@ const Graph = () => {
               <Paper elevation={0} sx={{ p: 6, borderRadius: 0, border: `1px solid ${theme.palette.divider}` }}>
                   <Typography variant="h5" fontWeight={900} sx={{ mb: 4, fontFamily: 'Merriweather' }}>Revenue Breakdown</Typography>
                   <Box sx={{ height: 300, width: '100%' }}>
-                      <ResponsiveContainer width="100%" height="100%">
+                      <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                           <BarChart data={chartData}>
                               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={alpha(theme.palette.primary.main, 0.1)} />
                               <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12, fontWeight: 700 }} dy={10} />
