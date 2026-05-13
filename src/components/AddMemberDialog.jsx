@@ -30,6 +30,7 @@ const AddMemberDialog = ({ open, onClose, onAddMember }) => {
   const [formData, setFormData] = useState({
     name: '', email: '', phone: '', address: '', dob: '', 
     department: '', membershipType: 'Member',
+    occupation: '', familyId: '', baptismDate: '', confirmationDate: '', campus: ''
   });
 
   const [errors, setErrors] = useState({});
@@ -56,7 +57,14 @@ const AddMemberDialog = ({ open, onClose, onAddMember }) => {
       setSubmitting(true);
       try {
         const sanitizedData = sanitize(formData);
-        await onAddMember({ ...sanitizedData, status: 'active' });
+        await onAddMember({ 
+          ...sanitizedData, 
+          membership_type: sanitizedData.membershipType,
+          family_id: sanitizedData.familyId,
+          baptism_date: sanitizedData.baptismDate,
+          confirmation_date: sanitizedData.confirmationDate,
+          status: 'active' 
+        });
       } catch {
         setSubmitting(false);
       }
@@ -69,8 +77,8 @@ const AddMemberDialog = ({ open, onClose, onAddMember }) => {
       onClose={onClose}
       slots={{ transition: Transition }}
       fullWidth
-      maxWidth="sm"
-      PaperProps={{ sx: { borderRadius: 3, p: 3 } }}
+      maxWidth="md"
+      slotProps={{ paper: { sx: { borderRadius: 3, p: 3 } } }}
     >
       <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
         <Typography variant="h6" fontWeight={800}>Register Member</Typography>
@@ -79,22 +87,31 @@ const AddMemberDialog = ({ open, onClose, onAddMember }) => {
 
       <DialogContent sx={{ p: 0, overflowY: 'visible' }}>
         <Grid container spacing={3}>
-            <Grid item xs={12}>
+            <Grid xs={12} sm={6}>
                 <TextField fullWidth label="Full Name" name="name" value={formData.name} onChange={handleChange} error={!!errors.name} helperText={errors.name} />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid xs={12} sm={6}>
                 <TextField fullWidth label="Email Address" name="email" value={formData.email} onChange={handleChange} />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid xs={12} sm={6}>
                 <TextField fullWidth label="Phone Number" name="phone" value={formData.phone} onChange={handleChange} />
             </Grid>
-            <Grid item xs={12}>
+            <Grid xs={12} sm={6}>
+                <TextField fullWidth label="Occupation" name="occupation" value={formData.occupation} onChange={handleChange} />
+            </Grid>
+            <Grid xs={12}>
                 <TextField fullWidth label="Home Address" name="address" value={formData.address} onChange={handleChange} multiline rows={2} />
             </Grid>
-            <Grid item xs={12} sm={6}>
-                <TextField fullWidth label="Date of Birth" name="dob" type="date" value={formData.dob} onChange={handleChange} InputLabelProps={{ shrink: true }} />
+            <Grid xs={12} sm={4}>
+                <TextField fullWidth label="Date of Birth" name="dob" type="date" value={formData.dob} onChange={handleChange} slotProps={{ inputLabel: { shrink: true } }} />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid xs={12} sm={4}>
+                <TextField fullWidth label="Baptism Date" name="baptismDate" type="date" value={formData.baptismDate} onChange={handleChange} slotProps={{ inputLabel: { shrink: true } }} />
+            </Grid>
+            <Grid xs={12} sm={4}>
+                <TextField fullWidth label="Confirmation Date" name="confirmationDate" type="date" value={formData.confirmationDate} onChange={handleChange} slotProps={{ inputLabel: { shrink: true } }} />
+            </Grid>
+            <Grid xs={12} sm={6}>
                 <FormControl fullWidth>
                     <InputLabel>Department</InputLabel>
                     <Select name="department" value={formData.department} onChange={handleChange} label="Department">
@@ -107,7 +124,10 @@ const AddMemberDialog = ({ open, onClose, onAddMember }) => {
                     </Select>
                 </FormControl>
             </Grid>
-            <Grid item xs={12}>
+            <Grid xs={12} sm={6}>
+                <TextField fullWidth label="Family Name/ID" name="familyId" value={formData.familyId} onChange={handleChange} />
+            </Grid>
+            <Grid xs={12} sm={6}>
                 <FormControl fullWidth>
                     <InputLabel>Membership Type</InputLabel>
                     <Select name="membershipType" value={formData.membershipType} onChange={handleChange} label="Membership Type">
@@ -116,6 +136,9 @@ const AddMemberDialog = ({ open, onClose, onAddMember }) => {
                         <MenuItem value="Staff">Ministerial Staff</MenuItem>
                     </Select>
                 </FormControl>
+            </Grid>
+            <Grid xs={12} sm={6}>
+                <TextField fullWidth label="Campus/Branch" name="campus" value={formData.campus} onChange={handleChange} />
             </Grid>
         </Grid>
       </DialogContent>

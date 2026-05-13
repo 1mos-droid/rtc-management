@@ -32,7 +32,7 @@ const AddStudyDialog = ({ open, onClose, onStudyAdded }) => {
   const handleClose = () => { setFormData({ title: '', subtitle: '', sessions: 1, progress: 0 }); onClose(); };
 
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm" PaperProps={{ sx: { borderRadius: 3, p: 3 } }}>
+    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm" slotProps={{ paper: { sx: { borderRadius: 3, p: 3 } } }}>
       <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
           <Typography variant="h6" fontWeight={800}>New Study Series</Typography>
           <IconButton size="small" onClick={handleClose}><X size={20}/></IconButton>

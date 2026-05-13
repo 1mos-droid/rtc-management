@@ -6,10 +6,12 @@ import { ColorModeContext } from './context/ColorModeContext.jsx';
 const getDesignTokens = (mode) => {
   const isLight = mode === 'light';
   
-  // Professional Administrative Palette
-  const primarySlate = isLight ? '#0F172A' : '#F8FAFC'; // Deep Navy / Off-white
-  const secondarySteel = isLight ? '#64748B' : '#94A3B8'; // Cool Gray
-  const accentGold = '#B59410'; // Refined Gold for highlights
+  // RTCI Brand Palette
+  const rtciRed = '#8A0332'; // Deep Red from logo
+  const rtciGold = '#B59410'; // Refined Gold from logo
+  const offWhite = '#F8FAFC';
+  const deepSlate = '#0F172A';
+  
   const backgroundGray = isLight ? '#F8FAFC' : '#020617';
   const surfacePaper = isLight ? '#FFFFFF' : '#0F172A';
   
@@ -17,28 +19,29 @@ const getDesignTokens = (mode) => {
     palette: {
       mode,
       primary: { 
-        main: primarySlate,
-        light: alpha(primarySlate, 0.7),
-        dark: isLight ? '#000000' : '#FFFFFF',
-        contrastText: isLight ? '#FFFFFF' : '#0F172A'
+        main: rtciRed,
+        light: alpha(rtciRed, 0.7),
+        dark: '#5a0221',
+        contrastText: '#FFFFFF'
       },
       secondary: { 
-        main: secondarySteel,
-        light: alpha(secondarySteel, 0.7),
-        dark: isLight ? '#475569' : '#CBD5E1'
+        main: rtciGold,
+        light: alpha(rtciGold, 0.7),
+        dark: '#8a710c',
+        contrastText: '#FFFFFF'
       },
       accent: {
-        main: accentGold,
+        main: rtciGold,
       },
       background: {
         default: backgroundGray,
         paper: surfacePaper,
       },
       text: {
-        primary: isLight ? '#0F172A' : '#F8FAFC',
+        primary: isLight ? deepSlate : offWhite,
         secondary: isLight ? '#64748B' : '#94A3B8',
       },
-      divider: alpha(isLight ? '#0F172A' : '#F8FAFC', 0.08),
+      divider: alpha(isLight ? deepSlate : offWhite, 0.08),
     },
     typography: {
       fontFamily: '"Inter", "system-ui", sans-serif',
@@ -48,7 +51,7 @@ const getDesignTokens = (mode) => {
       h4: { fontWeight: 700, letterSpacing: '-0.01em' },
       h5: { fontWeight: 700 },
       h6: { fontWeight: 700 },
-      subtitle1: { fontWeight: 500, color: secondarySteel },
+      subtitle1: { fontWeight: 500, color: isLight ? '#64748B' : '#94A3B8' },
       body1: { lineHeight: 1.6, fontSize: '0.95rem' },
       body2: { lineHeight: 1.5, fontSize: '0.85rem' },
       button: { fontWeight: 600, textTransform: 'none', letterSpacing: '0.01em' },
@@ -79,9 +82,9 @@ const getDesignTokens = (mode) => {
             },
           },
           containedPrimary: {
-            backgroundColor: primarySlate,
+            backgroundColor: rtciRed,
             '&:hover': {
-              backgroundColor: isLight ? '#1E293B' : '#E2E8F0',
+              backgroundColor: '#5a0221',
             }
           },
         },
@@ -93,7 +96,7 @@ const getDesignTokens = (mode) => {
             boxShadow: isLight 
               ? '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)'
               : '0 1px 3px 0 rgb(0 0 0 / 0.3), 0 1px 2px -1px rgb(0 0 0 / 0.3)',
-            border: `1px solid ${alpha(isLight ? '#0F172A' : '#F8FAFC', 0.08)}`,
+            border: `1px solid ${alpha(isLight ? deepSlate : offWhite, 0.08)}`,
             backgroundImage: 'none',
           },
         },
@@ -111,7 +114,7 @@ const getDesignTokens = (mode) => {
             '& .MuiOutlinedInput-root': {
               borderRadius: 8,
               '& fieldset': {
-                borderColor: alpha(isLight ? '#0F172A' : '#F8FAFC', 0.12),
+                borderColor: alpha(isLight ? deepSlate : offWhite, 0.12),
               },
             },
           },
@@ -121,9 +124,9 @@ const getDesignTokens = (mode) => {
         styleOverrides: {
           root: {
             backgroundColor: surfacePaper,
-            color: primarySlate,
+            color: rtciRed,
             boxShadow: 'none',
-            borderBottom: `1px solid ${alpha(isLight ? '#0F172A' : '#F8FAFC', 0.08)}`,
+            borderBottom: `1px solid ${alpha(isLight ? deepSlate : offWhite, 0.08)}`,
           },
         },
       },

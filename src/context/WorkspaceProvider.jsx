@@ -48,13 +48,26 @@ export const WorkspaceProvider = ({ children }) => {
     
     return data.filter(item => {
       if (!item) return false;
-      if (workspace === 'main') return true; // Show all in Main Sanctuary
+
+      // Hierarchical Scoping: Branch/Campus Restriction
+      // If user has a campus assigned (and is not an admin/developer), restrict view to that campus
+      if (user?.campus && !isDeveloper && !isAdmin) {
+        if (item.campus && item.campus !== user.campus) return false;
+      }
+
+      if (workspace === 'main') return true; // Show all relevant in Main Sanctuary
       
       const department = (item.department || '').toLowerCase();
-      if (workspace === 'youth') return department === 'youth';
-      if (workspace === 'music') return department === 'music team';
-      if (workspace === 'media') return department === 'media';
-      return true;
+      const ws = workspace.toLowerCase();
+      if (ws === 'youth' && department === 'youth') return true;
+      if (ws === 'music' && department === 'music team') return true;
+      if (ws === 'media' && department === 'media') return true;
+      
+      // Generic department/campus match
+      if (department === ws) return true;
+      if ((item.campus || '').toLowerCase() === ws) return true;
+
+      return false;
     });
   };
 

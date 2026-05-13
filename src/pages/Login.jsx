@@ -75,12 +75,14 @@ const Login = () => {
           p: { xs: 4, sm: 6 }, 
           borderRadius: 4, 
           border: `1px solid ${theme.palette.divider}`,
+          borderTop: `4px solid ${theme.palette.secondary.main}`,
           bgcolor: 'background.paper',
           textAlign: 'center',
+          boxShadow: theme.shadows[4]
         }}>
           <Box sx={{ mb: 4 }}>
-            <Box sx={{ width: 80, height: 80, mx: 'auto', mb: 3, bgcolor: 'primary.main', borderRadius: 2, p: 1 }}>
-              <img src={logo} alt="RTCI" style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
+            <Box sx={{ width: 80, height: 80, mx: 'auto', mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <img src={logo} alt="RTCI" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
             </Box>
             <Typography variant="h3" sx={{ mb: 1 }}>Welcome Back</Typography>
             <Typography variant="body2" color="text.secondary">
@@ -103,12 +105,14 @@ const Login = () => {
                 required
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Mail size={18} color={theme.palette.text.disabled} />
-                    </InputAdornment>
-                  ),
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Mail size={18} color={theme.palette.text.disabled} />
+                      </InputAdornment>
+                    ),
+                  },
                 }}
               />
 
@@ -119,19 +123,21 @@ const Login = () => {
                 required
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Lock size={18} color={theme.palette.text.disabled} />
-                    </InputAdornment>
-                  ),
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Lock size={18} color={theme.palette.text.disabled} />
+                      </InputAdornment>
+                    ),
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  },
                 }}
               />
 

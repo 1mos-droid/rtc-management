@@ -10,17 +10,19 @@ export const useAuth = () => {
   return context;
 };
 
-// Role Hierarchy: developer > admin > department_head > member
+// Role Hierarchy: developer > admin > pastor > department_head > member
 export const ROLES = {
   DEVELOPER: 'developer',
   ADMIN: 'admin',
+  PASTOR: 'pastor',
   DEPARTMENT_HEAD: 'department_head',
   MEMBER: 'member',
 };
 
 export const ROLE_LEVELS = {
-  [ROLES.DEVELOPER]: 4,
-  [ROLES.ADMIN]: 3,
+  [ROLES.DEVELOPER]: 5,
+  [ROLES.ADMIN]: 4,
+  [ROLES.PASTOR]: 3,
   [ROLES.DEPARTMENT_HEAD]: 2,
   [ROLES.MEMBER]: 1,
 };

@@ -40,7 +40,7 @@ const EditEventDialog = ({ open, onClose, onEditEvent, event }) => {
   };
 
   return (
-    <Dialog open={open} onClose={onClose} slots={{ transition: Transition }} fullWidth maxWidth="xs" PaperProps={{ sx: { borderRadius: 3, p: 3 } }}>
+    <Dialog open={open} onClose={onClose} slots={{ transition: Transition }} fullWidth maxWidth="xs" slotProps={{ paper: { sx: { borderRadius: 3, p: 3 } } }}>
       <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
           <Typography variant="h6" fontWeight={800}>Edit Event</Typography>
           <IconButton size="small" onClick={onClose}><X size={20}/></IconButton>
@@ -50,11 +50,11 @@ const EditEventDialog = ({ open, onClose, onEditEvent, event }) => {
         <Stack spacing={3}>
             <TextField fullWidth label="Event Title" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
             <Grid container spacing={2}>
-                <Grid item xs={6}>
-                    <TextField fullWidth type="date" label="Date" value={formData.date} onChange={(e) => setFormData({...formData, date: e.target.value})} InputLabelProps={{ shrink: true }} />
+                <Grid xs={6}>
+                    <TextField fullWidth type="date" label="Date" value={formData.date} onChange={(e) => setFormData({...formData, date: e.target.value})} slotProps={{ inputLabel: { shrink: true } }} />
                 </Grid>
-                <Grid item xs={6}>
-                    <TextField fullWidth type="time" label="Time" value={formData.time} onChange={(e) => setFormData({...formData, time: e.target.value})} InputLabelProps={{ shrink: true }} />
+                <Grid xs={6}>
+                    <TextField fullWidth type="time" label="Time" value={formData.time} onChange={(e) => setFormData({...formData, time: e.target.value})} slotProps={{ inputLabel: { shrink: true } }} />
                 </Grid>
             </Grid>
             <TextField fullWidth label="Location" value={formData.location} onChange={(e) => setFormData({...formData, location: e.target.value})} />

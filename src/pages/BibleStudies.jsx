@@ -142,7 +142,7 @@ const BibleStudies = () => {
             {activeTab === 0 ? (
                 <Grid container spacing={3}>
                     {studySeries.map((study) => (
-                        <Grid item xs={12} md={6} key={study.id}>
+                        <Grid xs={12} md={6} key={study.id}>
                             <Card elevation={0} sx={{ height: '100%', border: `1px solid ${theme.palette.divider}`, borderRadius: 3, position: 'relative' }}>
                                 <CardContent sx={{ p: 4, display: 'flex', flexDirection: 'column', height: '100%' }}>
                                     <Stack direction="row" sx={{ justifyContent: 'space-between', mb: 3 }}>
@@ -176,7 +176,7 @@ const BibleStudies = () => {
                         </Grid>
                     ))}
                     {studySeries.length === 0 && !loading && (
-                        <Grid item xs={12}>
+                        <Grid xs={12}>
                             <Box sx={{ py: 10, textAlign: 'center' }}>
                                 <Typography variant="body1" color="text.disabled">No study modules found.</Typography>
                             </Box>

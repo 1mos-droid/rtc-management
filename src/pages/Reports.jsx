@@ -80,7 +80,7 @@ const Reports = () => {
 
       <Grid container spacing={4}>
         {reportTypes.map((r) => (
-            <Grid item xs={12} md={4} key={r.id}>
+            <Grid xs={12} md={4} key={r.id}>
                 <Card elevation={0} sx={{ height: '100%', border: `1px solid ${theme.palette.divider}`, borderRadius: 3 }}>
                     <CardContent sx={{ p: 4, textAlign: 'center' }}>
                         <Box sx={{ 

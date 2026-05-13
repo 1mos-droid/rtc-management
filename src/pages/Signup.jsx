@@ -101,8 +101,10 @@ const Signup = () => {
           p: { xs: 4, sm: 6 }, 
           borderRadius: 4, 
           border: `1px solid ${theme.palette.divider}`,
+          borderTop: `4px solid ${theme.palette.secondary.main}`,
           bgcolor: 'background.paper',
           textAlign: 'center',
+          boxShadow: theme.shadows[4]
         }}>
           
           {signupSuccess ? (
@@ -142,12 +144,14 @@ const Signup = () => {
                     required
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <User size={18} color={theme.palette.text.disabled} />
-                        </InputAdornment>
-                      ),
+                    slotProps={{
+                      input: {
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <User size={18} color={theme.palette.text.disabled} />
+                          </InputAdornment>
+                        ),
+                      },
                     }}
                   />
 
@@ -158,12 +162,14 @@ const Signup = () => {
                     required
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <Mail size={18} color={theme.palette.text.disabled} />
-                        </InputAdornment>
-                      ),
+                    slotProps={{
+                      input: {
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Mail size={18} color={theme.palette.text.disabled} />
+                          </InputAdornment>
+                        ),
+                      },
                     }}
                   />
 
@@ -173,12 +179,14 @@ const Signup = () => {
                     label="Department"
                     value={formData.department}
                     onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <Building size={18} color={theme.palette.text.disabled} />
-                        </InputAdornment>
-                      ),
+                    slotProps={{
+                      input: {
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Building size={18} color={theme.palette.text.disabled} />
+                          </InputAdornment>
+                        ),
+                      },
                     }}
                   >
                       <MenuItem value=""><em>None / General</em></MenuItem>
@@ -196,19 +204,21 @@ const Signup = () => {
                     required
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <Lock size={18} color={theme.palette.text.disabled} />
-                        </InputAdornment>
-                      ),
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                          </IconButton>
-                        </InputAdornment>
-                      ),
+                    slotProps={{
+                      input: {
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Lock size={18} color={theme.palette.text.disabled} />
+                          </InputAdornment>
+                        ),
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      },
                     }}
                   />
 

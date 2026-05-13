@@ -30,24 +30,30 @@ export const AuthProvider = ({ children }) => {
       }
 
       if (!profile) {
-        console.log("🛠️ Creating profile for new user...");
-        const { data: newProfile, error: insertError } = await supabase
+        console.log("🛠️ Syncing profile for user...");
+        // Use upsert to handle potential race conditions with the DB trigger
+        const { data: syncedProfile, error: upsertError } = await supabase
           .from('profiles')
-          .insert([{
+          .upsert([{
             id: authUser.id,
             email: authUser.email,
             name: authUser.user_metadata?.name || authUser.email?.split('@')[0] || 'Member',
             role: authUser.user_metadata?.role || ROLES.MEMBER,
             department: authUser.user_metadata?.department || null
-          }])
+          }], { onConflict: 'id' })
           .select()
           .maybeSingle();
 
-        if (insertError) {
-          console.error("❌ Profile Creation Failed:", insertError.message);
+        if (upsertError) {
+          // If it's a 409/duplicate after all, try one more fetch as it means it was just created
+          if (upsertError.code === '23505') {
+            const { data: retryProfile } = await supabase.from('profiles').select('*').eq('id', authUser.id).maybeSingle();
+            if (retryProfile) return retryProfile;
+          }
+          console.error("❌ Profile Sync Failed:", upsertError.message);
           return null;
         }
-        return newProfile;
+        return syncedProfile;
       }
 
       return profile;
@@ -61,25 +67,21 @@ export const AuthProvider = ({ children }) => {
     try {
       const profile = await ensureProfileSync(authUser);
       
-      // If profile sync failed critically (e.g. 401), don't return partial data
-      if (!profile && authUser) {
-        return null;
-      }
-
+      // We prioritize the database profile, but fallback to auth metadata 
+      // if the profile is missing or sync fails non-critically.
       return {
         id: authUser.id,
         email: authUser.email,
-        name: profile?.name || authUser.user_metadata?.name || 'Member',
+        name: profile?.name || authUser.user_metadata?.name || authUser.email?.split('@')[0] || 'Member',
         role: profile?.role || authUser.user_metadata?.role || ROLES.MEMBER,
         department: profile?.department || authUser.user_metadata?.department || null,
       };
     } catch (err) {
       console.error("Failed to fetch user metadata:", err);
-      // Only fallback if it's a non-critical error
       return { 
         id: authUser.id, 
         email: authUser.email, 
-        name: authUser.user_metadata?.name || 'Member',
+        name: authUser.user_metadata?.name || authUser.email?.split('@')[0] || 'Member',
         role: authUser.user_metadata?.role || ROLES.MEMBER, 
         department: authUser.user_metadata?.department || null 
       };
@@ -151,13 +153,19 @@ export const AuthProvider = ({ children }) => {
       }
 
       if (session?.user) {
+        // Ensure we show loading state while fetching metadata
+        if (mounted) setLoading(true);
         const combinedUser = await fetchUserMetadata(session.user);
-        if (mounted) setUser(combinedUser);
+        if (mounted) {
+          setUser(combinedUser);
+          setLoading(false);
+        }
       } else {
-        if (mounted) setUser(null);
+        if (mounted) {
+          setUser(null);
+          setLoading(false);
+        }
       }
-      
-      if (mounted) setLoading(false);
     });
 
     return () => {
@@ -173,17 +181,20 @@ export const AuthProvider = ({ children }) => {
       const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password });
       if (authError) throw authError;
       
-      const combinedUser = await fetchUserMetadata(data.user);
-      setUser(combinedUser);
-      return combinedUser;
+      // We no longer manually fetch metadata and setUser here.
+      // onAuthStateChange will catch the SIGNED_IN event and handle it.
+      // This prevents race conditions where two concurrent metadata fetches 
+      // could collide or set state out of order.
+      return data.user;
     } catch (err) {
       console.error("Supabase Auth Error:", err);
       let message = err.message || 'Invalid email or password.';
       setError(message);
+      setLoading(false); // Only set loading false on error
       throw new Error(message);
-    } finally {
-      setLoading(false);
     }
+    // Note: We don't have a 'finally { setLoading(false) }' here because 
+    // onAuthStateChange will handle the success path.
   };
 
   const signup = async (email, password, name, department = null) => {
@@ -207,19 +218,11 @@ export const AuthProvider = ({ children }) => {
       if (authError) throw authError;
 
       if (data.user) {
-        const combinedUser = { 
-          id: data.user.id, 
-          email: data.user.email, 
-          name, 
-          role: ROLES.MEMBER, 
-          department 
-        };
-        
         // If the user is logged in immediately (Confirm Email is OFF in Supabase),
         // we can and should perform a client-side upsert to ensure the profile exists.
         if (data.session) {
           console.log("Session detected, performing manual profile sync...");
-          const { error: profileError } = await supabase
+          await supabase
             .from('profiles')
             .upsert({
               id: data.user.id,
@@ -228,26 +231,21 @@ export const AuthProvider = ({ children }) => {
               role: ROLES.MEMBER,
               department
             });
-          
-          if (profileError) {
-            console.error("Manual profile sync failed:", profileError);
-          } else {
-            console.log("Manual profile sync successful.");
-          }
-          
-          setUser(combinedUser);
         }
         
-        return { user: combinedUser, session: data.session };
+        return { user: data.user, session: data.session };
       }
     } catch (err) {
       console.error("Signup Error:", err);
       let message = err.message || 'Registration failed.';
       setError(message);
-      throw new Error(message);
-    } finally {
       setLoading(false);
+      throw new Error(message);
     }
+    // onAuthStateChange will handle loading(false) if a session was created.
+    // If no session was created (e.g. email confirmation required), signup 
+    // needs to handle its own loading state.
+    setLoading(false);
   };
 
   const logout = useCallback(async () => {
@@ -288,6 +286,7 @@ export const AuthProvider = ({ children }) => {
     isDeveloper: user?.role === ROLES.DEVELOPER,
     effectiveRole: mimicRole || user?.role,
     isAdmin: hasRole(ROLES.ADMIN),
+    isPastor: hasRole(ROLES.PASTOR),
     isDeptHead: hasRole(ROLES.DEPARTMENT_HEAD),
     isAuthenticated: !!user,
     ROLES,

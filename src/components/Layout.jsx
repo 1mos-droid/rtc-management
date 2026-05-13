@@ -44,7 +44,12 @@ import {
   Network,
   Book,
   HelpCircle,
-  UserCheck
+  UserCheck,
+  Layers,
+  Baby,
+  Send,
+  MessageSquare,
+  Image as ImageIcon
 } from 'lucide-react';
 import { useColorMode } from '../context/ColorModeContext.jsx';
 import { useAuth } from '../context/AuthContext';
@@ -102,11 +107,17 @@ const NavItem = styled(Link)(({ theme, active }) => ({
 const NAV_ITEMS = [
   { text: 'Dashboard', path: '/', icon: LayoutDashboard },
   { text: 'Members', path: '/members', icon: Users },
+  { text: 'Groups', path: '/groups', icon: Layers },
+  { text: 'Children', path: '/children', icon: Baby },
+  { text: 'Communication', path: '/messaging', icon: Send },
   { text: 'Attendance', path: '/attendance', icon: UserCheck },
   { text: 'Financials', path: '/financials', icon: Coins },
   { text: 'Events', path: '/events', icon: Calendar },
+  { text: 'Prayer Requests', path: '/prayer-requests', icon: MessageSquare },
   { text: 'Library', path: '/bible-studies', icon: BookOpen },
   { text: 'Live Bible', path: '/live-bible', icon: Book },
+  { text: 'Service Gallery', path: '/gallery', icon: ImageIcon },
+  { text: 'Church Leadership', path: '/leadership', icon: ShieldCheck },
 ];
 
 const ADMIN_ITEMS = [
@@ -155,8 +166,11 @@ const AppLayout = ({ children }) => {
         { label: 'Main Menu', items: [
           { text: 'Dashboard', path: '/', icon: LayoutDashboard },
           { text: 'Events', path: '/events', icon: Calendar },
+          { text: 'Prayer Requests', path: '/prayer-requests', icon: MessageSquare },
           { text: 'Library', path: '/bible-studies', icon: BookOpen },
           { text: 'Live Bible', path: '/live-bible', icon: Book },
+          { text: 'Service Gallery', path: '/gallery', icon: ImageIcon },
+          { text: 'Church Leadership', path: '/leadership', icon: ShieldCheck },
         ]},
         { label: 'Support', items: UTILITY_ITEMS }
       ];
@@ -185,8 +199,8 @@ const AppLayout = ({ children }) => {
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', p: 3 }}>
       {/* Brand */}
       <Stack direction="row" spacing={2} sx={{ alignItems: 'center', mb: 6, px: 1 }}>
-        <Box sx={{ width: 40, height: 40, bgcolor: 'primary.main', borderRadius: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', p: 0.5 }}>
-          <img src={logo} alt="RTCI" style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
+        <Box sx={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <img src={logo} alt="RTCI" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
         </Box>
         <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: -0.5, color: 'text.primary', fontSize: '1.1rem' }}>
           RTCI Portal
@@ -252,7 +266,7 @@ const AppLayout = ({ children }) => {
         anchor="left"
         open={mobileOpen}
         onClose={() => setMobileOpen(false)}
-        PaperProps={{ sx: { width: 280, border: 'none' } }}
+        slotProps={{ paper: { sx: { width: 280, border: 'none' } } }}
       >
         {SidebarContent}
       </Drawer>
@@ -307,7 +321,7 @@ const AppLayout = ({ children }) => {
                 anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}
                 transformOrigin={{ horizontal: 'right', vertical: 'top' }} 
                 anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-                PaperProps={{ sx: { mt: 1.5, minWidth: 200, borderRadius: 2, p: 1, boxShadow: theme.shadows[3] } }}
+                slotProps={{ paper: { sx: { mt: 1.5, minWidth: 200, borderRadius: 2, p: 1, boxShadow: theme.shadows[3] } } }}
               >
                 <MenuItem component={Link} to="/settings" onClick={handleClose} sx={{ py: 1.2, gap: 1.5, borderRadius: 1 }}>
                   <Settings size={16} /> <Typography variant="body2" fontWeight={600}>Settings</Typography>

@@ -56,7 +56,8 @@ const MemberDetailsDialog = ({ open, onClose, member, onEdit, onDelete }) => {
   
   const [formData, setFormData] = useState({
     name: '', email: '', phone: '', address: '', dob: '', 
-    status: '', department: ''    
+    status: '', department: '', occupation: '', family_id: '',
+    baptism_date: '', confirmation_date: '', campus: ''
   });
 
   useEffect(() => {
@@ -68,7 +69,12 @@ const MemberDetailsDialog = ({ open, onClose, member, onEdit, onDelete }) => {
         address: member.address || '',
         dob: member.dob || '', 
         status: member.status || 'active',
-        department: member.department || ''      
+        department: member.department || '',
+        occupation: member.occupation || '',
+        family_id: member.family_id || '',
+        baptism_date: member.baptism_date || '',
+        confirmation_date: member.confirmation_date || '',
+        campus: member.campus || ''
       });
       setIsEditing(false);
       setTabValue(0);
@@ -124,7 +130,7 @@ const MemberDetailsDialog = ({ open, onClose, member, onEdit, onDelete }) => {
       slots={{ transition: Transition }}
       fullWidth
       maxWidth="md"
-      PaperProps={{ sx: { borderRadius: 3, overflow: 'hidden' } }}
+      slotProps={{ paper: { sx: { borderRadius: 3, overflow: 'hidden' } } }}
     >
       <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, minHeight: 600 }}>
         
@@ -217,19 +223,49 @@ const MemberDetailsDialog = ({ open, onClose, member, onEdit, onDelete }) => {
                         </Stack>
 
                         <Grid container spacing={3}>
-                            <Grid item xs={12} sm={6}>
+                            <Grid xs={12} sm={6}>
                                 <Typography variant="caption" fontWeight={700} color="text.disabled" sx={{ textTransform: 'uppercase', display: 'block', mb: 1 }}>Email Address</Typography>
                                 {isEditing ? <TextField fullWidth size="small" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} /> : (
                                     <Typography variant="body2" fontWeight={600}>{member.email || '—'}</Typography>
                                 )}
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid xs={12} sm={6}>
                                 <Typography variant="caption" fontWeight={700} color="text.disabled" sx={{ textTransform: 'uppercase', display: 'block', mb: 1 }}>Phone Number</Typography>
                                 {isEditing ? <TextField fullWidth size="small" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} /> : (
                                     <Typography variant="body2" fontWeight={600}>{member.phone || '—'}</Typography>
                                 )}
                             </Grid>
-                            <Grid item xs={12}>
+                            <Grid xs={12} sm={6}>
+                                <Typography variant="caption" fontWeight={700} color="text.disabled" sx={{ textTransform: 'uppercase', display: 'block', mb: 1 }}>Occupation</Typography>
+                                {isEditing ? <TextField fullWidth size="small" value={formData.occupation} onChange={(e) => setFormData({...formData, occupation: e.target.value})} /> : (
+                                    <Typography variant="body2" fontWeight={600}>{member.occupation || '—'}</Typography>
+                                )}
+                            </Grid>
+                            <Grid xs={12} sm={6}>
+                                <Typography variant="caption" fontWeight={700} color="text.disabled" sx={{ textTransform: 'uppercase', display: 'block', mb: 1 }}>Family ID/Name</Typography>
+                                {isEditing ? <TextField fullWidth size="small" value={formData.family_id} onChange={(e) => setFormData({...formData, family_id: e.target.value})} /> : (
+                                    <Typography variant="body2" fontWeight={600}>{member.family_id || '—'}</Typography>
+                                )}
+                            </Grid>
+                            <Grid xs={12} sm={4}>
+                                <Typography variant="caption" fontWeight={700} color="text.disabled" sx={{ textTransform: 'uppercase', display: 'block', mb: 1 }}>Baptism Date</Typography>
+                                {isEditing ? <TextField fullWidth size="small" type="date" value={formData.baptism_date} onChange={(e) => setFormData({...formData, baptism_date: e.target.value})} slotProps={{ inputLabel: { shrink: true } }} /> : (
+                                    <Typography variant="body2" fontWeight={600}>{member.baptism_date ? format(safeParseDate(member.baptism_date), 'MMM dd, yyyy') : '—'}</Typography>
+                                )}
+                            </Grid>
+                            <Grid xs={12} sm={4}>
+                                <Typography variant="caption" fontWeight={700} color="text.disabled" sx={{ textTransform: 'uppercase', display: 'block', mb: 1 }}>Confirmation Date</Typography>
+                                {isEditing ? <TextField fullWidth size="small" type="date" value={formData.confirmation_date} onChange={(e) => setFormData({...formData, confirmation_date: e.target.value})} slotProps={{ inputLabel: { shrink: true } }} /> : (
+                                    <Typography variant="body2" fontWeight={600}>{member.confirmation_date ? format(safeParseDate(member.confirmation_date), 'MMM dd, yyyy') : '—'}</Typography>
+                                )}
+                            </Grid>
+                            <Grid xs={12} sm={4}>
+                                <Typography variant="caption" fontWeight={700} color="text.disabled" sx={{ textTransform: 'uppercase', display: 'block', mb: 1 }}>Campus/Branch</Typography>
+                                {isEditing ? <TextField fullWidth size="small" value={formData.campus} onChange={(e) => setFormData({...formData, campus: e.target.value})} /> : (
+                                    <Typography variant="body2" fontWeight={600}>{member.campus || '—'}</Typography>
+                                )}
+                            </Grid>
+                            <Grid xs={12}>
                                 <Typography variant="caption" fontWeight={700} color="text.disabled" sx={{ textTransform: 'uppercase', display: 'block', mb: 1 }}>Home Address</Typography>
                                 {isEditing ? <TextField fullWidth size="small" multiline rows={2} value={formData.address} onChange={(e) => setFormData({...formData, address: e.target.value})} /> : (
                                     <Typography variant="body2" fontWeight={600}>{member.address || '—'}</Typography>

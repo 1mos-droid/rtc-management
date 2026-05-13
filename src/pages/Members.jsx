@@ -209,12 +209,14 @@ const Members = () => {
             placeholder="Search members..." 
             value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
             sx={{ flexGrow: 1, minWidth: 200 }}
-            InputProps={{
-                startAdornment: (
-                    <InputAdornment position="start">
-                        <Search size={18} style={{ color: theme.palette.text.disabled }} />
-                    </InputAdornment>
-                ),
+            slotProps={{
+                input: {
+                    startAdornment: (
+                        <InputAdornment position="start">
+                            <Search size={18} style={{ color: theme.palette.text.disabled }} />
+                        </InputAdornment>
+                    ),
+                },
             }}
         />
         <Button variant="outlined" startIcon={<Filter size={16} />} size="small">Filter</Button>

@@ -163,13 +163,13 @@ const Events = () => {
       ) : (
           <Grid container spacing={3}>
             {filteredEvents.length === 0 ? (
-                <Grid item xs={12}>
+                <Grid xs={12}>
                     <Box sx={{ py: 10, textAlign: 'center', border: `2px dashed ${theme.palette.divider}`, borderRadius: 3 }}>
                         <Typography variant="body1" color="text.disabled">No upcoming events scheduled.</Typography>
                     </Box>
                 </Grid>
             ) : filteredEvents.map((event) => (
-                <Grid item xs={12} md={6} key={event.id}>
+                <Grid xs={12} md={6} key={event.id}>
                     <Card elevation={0} sx={{ border: `1px solid ${theme.palette.divider}`, borderRadius: 3, '&:hover': { borderColor: theme.palette.primary.main, bgcolor: alpha(theme.palette.primary.main, 0.01) }, transition: 'all 0.2s ease' }}>
                         <CardContent sx={{ p: 3, display: 'flex', gap: 3 }}>
                             <Box sx={{ textAlign: 'center', minWidth: 60 }}>
@@ -203,18 +203,18 @@ const Events = () => {
       )}
 
       {/* Creator Dialog */}
-      <Dialog open={openCreator} onClose={() => setOpenCreator(false)} fullWidth maxWidth="xs" PaperProps={{ sx: { borderRadius: 3, p: 3 } }}>
+      <Dialog open={openCreator} onClose={() => setOpenCreator(false)} fullWidth maxWidth="xs" slotProps={{ paper: { sx: { borderRadius: 3, p: 3 } } }}>
           <Typography variant="h6" fontWeight={800} sx={{ mb: 3 }}>Schedule New Event</Typography>
           
           <form onSubmit={handleCreate}>
               <Stack spacing={3}>
                   <TextField fullWidth label="Event Title" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
                   <Grid container spacing={2}>
-                      <Grid item xs={6}>
-                          <TextField fullWidth type="date" label="Date" value={formData.date} onChange={(e) => setFormData({...formData, date: e.target.value})} InputLabelProps={{ shrink: true }} />
+                      <Grid xs={6}>
+                          <TextField fullWidth type="date" label="Date" value={formData.date} onChange={(e) => setFormData({...formData, date: e.target.value})} slotProps={{ inputLabel: { shrink: true } }} />
                       </Grid>
-                      <Grid item xs={6}>
-                          <TextField fullWidth type="time" label="Time" value={formData.time} onChange={(e) => setFormData({...formData, time: e.target.value})} InputLabelProps={{ shrink: true }} />
+                      <Grid xs={6}>
+                          <TextField fullWidth type="time" label="Time" value={formData.time} onChange={(e) => setFormData({...formData, time: e.target.value})} slotProps={{ inputLabel: { shrink: true } }} />
                       </Grid>
                   </Grid>
                   <TextField fullWidth label="Location" value={formData.location} onChange={(e) => setFormData({...formData, location: e.target.value})} />

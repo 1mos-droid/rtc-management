@@ -20,6 +20,12 @@ const Graph = lazy(() => import('../pages/Graph'));
 const Login = lazy(() => import('../pages/Login'));
 const Signup = lazy(() => import('../pages/Signup'));
 const DeveloperView = lazy(() => import('../pages/DeveloperView'));
+const PrayerRequests = lazy(() => import('../pages/PrayerRequests'));
+const Groups = lazy(() => import('../pages/Groups'));
+const Children = lazy(() => import('../pages/Children'));
+const Messaging = lazy(() => import('../pages/Messaging'));
+const Gallery = lazy(() => import('../pages/Gallery'));
+const Leadership = lazy(() => import('../pages/Leadership'));
 
 const PageLoader = () => (
   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
@@ -53,12 +59,18 @@ const AppRouter = () => {
         {/* Protected Routes */}
         <Route path="/" element={<RequireAuth><Dashboard /></RequireAuth>} />
         <Route path="/members" element={<RequireAuth><RequireRole roles={[ROLES.DEPARTMENT_HEAD]}><Members /></RequireRole></RequireAuth>} />
+        <Route path="/groups" element={<RequireAuth><RequireRole roles={[ROLES.DEPARTMENT_HEAD]}><Groups /></RequireRole></RequireAuth>} />
+        <Route path="/children" element={<RequireAuth><RequireRole roles={[ROLES.DEPARTMENT_HEAD]}><Children /></RequireRole></RequireAuth>} />
+        <Route path="/messaging" element={<RequireAuth><RequireRole roles={[ROLES.DEPARTMENT_HEAD]}><Messaging /></RequireRole></RequireAuth>} />
         <Route path="/attendance" element={<RequireAuth><RequireRole roles={[ROLES.DEPARTMENT_HEAD]}><Attendance /></RequireRole></RequireAuth>} />
         <Route path="/financials" element={<RequireAuth><RequireRole roles={[ROLES.DEPARTMENT_HEAD]}><Financials /></RequireRole></RequireAuth>} />
         <Route path="/events" element={<RequireAuth><Events /></RequireAuth>} />
         <Route path="/reports" element={<RequireAuth><RequireRole roles={[ROLES.DEPARTMENT_HEAD]}><Reports /></RequireRole></RequireAuth>} />
         <Route path="/bible-studies" element={<RequireAuth><BibleStudies /></RequireAuth>} />
+        <Route path="/prayer-requests" element={<RequireAuth><PrayerRequests /></RequireAuth>} />
         <Route path="/live-bible" element={<RequireAuth><LiveBible /></RequireAuth>} />
+        <Route path="/gallery" element={<RequireAuth><Gallery /></RequireAuth>} />
+        <Route path="/leadership" element={<RequireAuth><Leadership /></RequireAuth>} />
         <Route path="/settings" element={<RequireAuth><Settings /></RequireAuth>} />
         <Route path="/help" element={<RequireAuth><Help /></RequireAuth>} />
 

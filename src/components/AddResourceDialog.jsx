@@ -38,7 +38,7 @@ const AddResourceDialog = ({ open, onClose, onResourceAdded }) => {
   const handleClose = () => { setTitle(''); setType('pdf'); onClose(); };
 
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="xs" PaperProps={{ sx: { borderRadius: 3, p: 3 } }}>
+    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="xs" slotProps={{ paper: { sx: { borderRadius: 3, p: 3 } } }}>
       <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
           <Typography variant="h6" fontWeight={800}>Add Resource</Typography>
           <IconButton size="small" onClick={handleClose}><X size={20}/></IconButton>

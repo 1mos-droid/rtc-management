@@ -5,7 +5,7 @@ import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar 
 } from 'recharts';
 import { format } from 'date-fns';
-import { Zap } from 'lucide-react';
+import { Zap, TrendingUp, Users, DollarSign } from 'lucide-react';
 
 import { supabase } from '../supabase';
 import { safeParseDate } from '../utils/dateUtils';
@@ -15,6 +15,7 @@ const Graph = () => {
   const { filterData } = useWorkspace();
   const [loading, setLoading] = useState(true);
   const [chartData, setChartData] = useState([]);
+  const [growthTrends, setGrowthTrends] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -22,7 +23,7 @@ const Graph = () => {
         setLoading(true);
         const [aRes, tRes, mRes] = await Promise.all([
           supabase.from('attendance').select('*').order('date', { ascending: false }).limit(100),
-          supabase.from('transactions').select('*').order('date', { ascending: false }).limit(500),
+          supabase.from('transactions').select('*').order('date', { ascending: false }).limit(1000),
           supabase.from('members').select('*').limit(2000),
         ]);
 
@@ -32,6 +33,23 @@ const Graph = () => {
 
         const filteredMembers = filterData(mData);
         const totalCount = filteredMembers.length;
+
+        // Group members by month for growth trend
+        const growth = filteredMembers.reduce((acc, m) => {
+          const month = format(safeParseDate(m.created_at), 'MMM yy');
+          acc[month] = (acc[month] || 0) + 1;
+          return acc;
+        }, {});
+
+        const gData = Object.keys(growth).map(month => ({
+          month,
+          count: growth[month]
+        })).sort((a, b) => {
+            const dateA = new Date(a.month.split(' ')[1], ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].indexOf(a.month.split(' ')[0]));
+            const dateB = new Date(b.month.split(' ')[1], ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].indexOf(b.month.split(' ')[0]));
+            return dateA - dateB;
+        });
+        setGrowthTrends(gData);
 
         const combined = aData.map(record => {
           const rDate = safeParseDate(record.date);
@@ -62,11 +80,14 @@ const Graph = () => {
 
       {loading ? <CircularProgress /> : (
       <Grid container spacing={6}>
-          <Grid size={{ xs: 12 }}>
-              <Paper elevation={0} sx={{ p: 6, borderRadius: 0, border: `1px solid ${theme.palette.divider}`, bgcolor: alpha(theme.palette.primary.main, 0.01) }}>
-                  <Typography variant="h5" fontWeight={900} sx={{ mb: 4, fontFamily: 'Merriweather' }}>Engagement Trajectory</Typography>
-                  <Box sx={{ height: 400, width: '100%' }}>
-                      <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+          <Grid xs={12} md={8}>
+              <Paper elevation={0} sx={{ p: 4, borderRadius: 3, border: `1px solid ${theme.palette.divider}`, bgcolor: alpha(theme.palette.primary.main, 0.01) }}>
+                  <Stack direction="row" spacing={2} sx={{ mb: 4, alignItems: 'center' }}>
+                      <TrendingUp size={20} color={theme.palette.primary.main} />
+                      <Typography variant="h6" fontWeight={800}>Engagement Trajectory</Typography>
+                  </Stack>
+                  <Box sx={{ height: 350, width: '100%' }}>
+                      <ResponsiveContainer width="100%" height="100%">
                           <AreaChart data={chartData}>
                               <defs>
                                   <linearGradient id="colorAtt" x1="0" y1="0" x2="0" y2="1">
@@ -77,35 +98,58 @@ const Graph = () => {
                               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={alpha(theme.palette.primary.main, 0.1)} />
                               <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12, fontWeight: 700 }} dy={10} />
                               <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fontWeight: 700 }} unit="%" />
-                              <Tooltip contentStyle={{ borderRadius: 0, border: `1px solid ${theme.palette.divider}` }} />
+                              <Tooltip contentStyle={{ borderRadius: 12, border: 'none', boxShadow: theme.shadows[3] }} />
                               <Area type="monotone" dataKey="attendance" stroke={theme.palette.primary.main} strokeWidth={3} fillOpacity={1} fill="url(#colorAtt)" />
                           </AreaChart>
                       </ResponsiveContainer>
                   </Box>
               </Paper>
           </Grid>
+
+          <Grid xs={12} md={4}>
+              <Paper elevation={0} sx={{ p: 4, borderRadius: 3, border: `1px solid ${theme.palette.divider}` }}>
+                  <Stack direction="row" spacing={2} sx={{ mb: 4, alignItems: 'center' }}>
+                      <Users size={20} color={theme.palette.success.main} />
+                      <Typography variant="h6" fontWeight={800}>Church Growth</Typography>
+                  </Stack>
+                  <Box sx={{ height: 350, width: '100%' }}>
+                      <ResponsiveContainer width="100%" height="100%">
+                          <BarChart data={growthTrends}>
+                              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={alpha(theme.palette.text.primary, 0.05)} />
+                              <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 11, fontWeight: 700 }} />
+                              <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fontWeight: 700 }} />
+                              <Tooltip contentStyle={{ borderRadius: 12, border: 'none', boxShadow: theme.shadows[3] }} />
+                              <Bar dataKey="count" fill={theme.palette.success.main} radius={[4, 4, 0, 0]} />
+                          </BarChart>
+                      </ResponsiveContainer>
+                  </Box>
+              </Paper>
+          </Grid>
           
-          <Grid size={{ xs: 12, md: 8 }}>
-              <Paper elevation={0} sx={{ p: 6, borderRadius: 0, border: `1px solid ${theme.palette.divider}` }}>
-                  <Typography variant="h5" fontWeight={900} sx={{ mb: 4, fontFamily: 'Merriweather' }}>Revenue Breakdown</Typography>
+          <Grid xs={12} md={8}>
+              <Paper elevation={0} sx={{ p: 4, borderRadius: 3, border: `1px solid ${theme.palette.divider}` }}>
+                  <Stack direction="row" spacing={2} sx={{ mb: 4, alignItems: 'center' }}>
+                      <DollarSign size={20} color={theme.palette.primary.main} />
+                      <Typography variant="h6" fontWeight={800}>Giving Patterns</Typography>
+                  </Stack>
                   <Box sx={{ height: 300, width: '100%' }}>
-                      <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+                      <ResponsiveContainer width="100%" height="100%">
                           <BarChart data={chartData}>
-                              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={alpha(theme.palette.primary.main, 0.1)} />
+                              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={alpha(theme.palette.text.primary, 0.05)} />
                               <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12, fontWeight: 700 }} dy={10} />
                               <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fontWeight: 700 }} />
-                              <Tooltip cursor={{ fill: alpha(theme.palette.primary.main, 0.03) }} />
-                              <Bar dataKey="income" fill={theme.palette.primary.main} radius={0} />
+                              <Tooltip contentStyle={{ borderRadius: 12, border: 'none', boxShadow: theme.shadows[3] }} cursor={{ fill: alpha(theme.palette.primary.main, 0.03) }} />
+                              <Bar dataKey="income" fill={theme.palette.primary.main} radius={[4, 4, 0, 0]} />
                           </BarChart>
                       </ResponsiveContainer>
                   </Box>
               </Paper>
           </Grid>
 
-          <Grid size={{ xs: 12, md: 4 }}>
-              <Paper elevation={0} sx={{ p: 6, borderRadius: 0, border: `1px solid ${theme.palette.divider}`, bgcolor: 'primary.main', color: '#fff' }}>
+          <Grid xs={12} md={4}>
+              <Paper elevation={0} sx={{ p: 4, borderRadius: 3, border: 'none', bgcolor: 'primary.main', color: '#fff', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                   <Zap size={32} style={{ marginBottom: 24 }} />
-                  <Typography variant="h5" fontWeight={900} sx={{ fontFamily: 'Merriweather' }}>Real-time Intelligence</Typography>
+                  <Typography variant="h5" fontWeight={900}>Real-time Intelligence</Typography>
                   <Typography variant="body2" sx={{ mt: 2, opacity: 0.8, lineHeight: 1.8 }}>
                       All data points are synchronized with the central sanctuary database to ensure accurate decision-making for leadership.
                   </Typography>
