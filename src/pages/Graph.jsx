@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useWorkspace } from '../context/WorkspaceContext';
-import { Box, Typography, useTheme, Grid, alpha, Paper, CircularProgress } from '@mui/material';
+import { Box, Typography, useTheme, Grid, alpha, Paper, CircularProgress, Stack } from '@mui/material';
 import { 
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar 
 } from 'recharts';

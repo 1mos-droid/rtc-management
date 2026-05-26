@@ -449,3 +449,69 @@ create policy "Pastors, Admins and Dept Heads can manage gallery."
 -- Update realtime to include service_images
 alter publication supabase_realtime add table service_images;
 
+
+-- 17. SUPABASE STORAGE BUCKETS & RLS POLICIES
+-- Create buckets if they do not already exist
+INSERT INTO storage.buckets (id, name, public)
+VALUES 
+  ('service-gallery', 'service-gallery', true),
+  ('official-profiles', 'official-profiles', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Set up Row-Level Security for storage.objects
+ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
+
+-- Set up Policies for "service-gallery" Bucket
+-- Allow public (anyone) to read/select images in the service gallery
+CREATE POLICY "Public Access to service-gallery"
+ON storage.objects FOR SELECT
+USING (bucket_id = 'service-gallery');
+
+-- Allow authenticated users with admin/developer/pastor/department_head role to upload to service-gallery
+CREATE POLICY "Authenticated users can upload to service-gallery"
+ON storage.objects FOR INSERT
+WITH CHECK (
+  bucket_id = 'service-gallery' 
+  AND auth.role() = 'authenticated'
+  AND (public.get_my_role() IN ('admin', 'developer', 'pastor', 'department_head'))
+);
+
+-- Allow authorized users to delete from service-gallery
+CREATE POLICY "Authenticated users can delete from service-gallery"
+ON storage.objects FOR DELETE
+USING (
+  bucket_id = 'service-gallery'
+  AND auth.role() = 'authenticated'
+  AND (public.get_my_role() IN ('admin', 'developer', 'pastor', 'department_head'))
+);
+
+-- Set up Policies for "official-profiles" Bucket (Avatars)
+-- Allow public (anyone) to view profile pictures
+CREATE POLICY "Public Access to official-profiles"
+ON storage.objects FOR SELECT
+USING (bucket_id = 'official-profiles');
+
+-- Allow authenticated users to upload avatars
+CREATE POLICY "Authenticated users can upload to official-profiles"
+ON storage.objects FOR INSERT
+WITH CHECK (
+  bucket_id = 'official-profiles' 
+  AND auth.role() = 'authenticated'
+);
+
+-- Allow authenticated users to update/delete avatars
+CREATE POLICY "Authenticated users can update official-profiles"
+ON storage.objects FOR UPDATE
+USING (
+  bucket_id = 'official-profiles'
+  AND auth.role() = 'authenticated'
+);
+
+CREATE POLICY "Authenticated users can delete from official-profiles"
+ON storage.objects FOR DELETE
+USING (
+  bucket_id = 'official-profiles'
+  AND auth.role() = 'authenticated'
+);
+
+
