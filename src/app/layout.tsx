@@ -5,6 +5,7 @@ import { WorkspaceProvider } from '../context/WorkspaceProvider';
 import { SecurityManager } from '../components/SecurityManager';
 import { RouteGuard } from '../components/RouteGuard';
 import AppLayout from '../components/Layout';
+import { Analytics } from '@vercel/analytics/next';
 import '../index.css';
 
 export const metadata = {
@@ -75,6 +76,7 @@ export default function RootLayout({ children }) {
             </ThemeConfig>
           </WorkspaceProvider>
         </AuthProvider>
+        <Analytics />
       </body>
     </html>
   );
