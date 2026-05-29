@@ -93,22 +93,27 @@ alter table public.members enable row level security;
 
 create policy "Dept Heads can view members in their department."
   on members for select using (
-    get_my_role() = 'department_head' and (department = get_my_department() or get_my_department() is null)
+    get_my_role() = 'department_head' and (department = get_my_department() and get_my_department() is not null)
   );
 
-create policy "Admins and Developers can view all members."
+create policy "Admins, Developers and Pastors can view all members."
   on members for select using (
-    get_my_role() in ('admin', 'developer')
+    get_my_role() in ('admin', 'developer', 'pastor')
+  );
+
+create policy "Members can view their own record."
+  on members for select using (
+    email = (select email from public.profiles where id = auth.uid())
   );
 
 create policy "Dept Heads can manage members in their department."
   on members for all using (
-    get_my_role() = 'department_head' and (department = get_my_department() or get_my_department() is null)
+    get_my_role() = 'department_head' and (department = get_my_department() and get_my_department() is not null)
   );
 
-create policy "Admins and Developers can manage all members."
+create policy "Admins, Developers and Pastors can manage all members."
   on members for all using (
-    get_my_role() in ('admin', 'developer')
+    get_my_role() in ('admin', 'developer', 'pastor')
   );
 
 -- 5. TRANSACTIONS TABLE
@@ -319,9 +324,9 @@ create policy "Dept Heads can view attendance for their department."
     get_my_role() = 'department_head' and department = get_my_department()
   );
 
-create policy "Admins and Developers can view all attendance."
+create policy "Admins, Developers and Pastors can view all attendance."
   on attendance for select using (
-    get_my_role() in ('admin', 'developer')
+    get_my_role() in ('admin', 'developer', 'pastor')
   );
 
 create policy "Dept Heads can manage attendance for their department."
@@ -329,9 +334,9 @@ create policy "Dept Heads can manage attendance for their department."
     get_my_role() = 'department_head' and department = get_my_department()
   );
 
-create policy "Admins and Developers can manage all attendance."
+create policy "Admins, Developers and Pastors can manage all attendance."
   on attendance for all using (
-    get_my_role() in ('admin', 'developer')
+    get_my_role() in ('admin', 'developer', 'pastor')
   );
 
 -- 12. BIBLE STUDIES & RESOURCES
@@ -513,5 +518,29 @@ USING (
   bucket_id = 'official-profiles'
   AND auth.role() = 'authenticated'
 );
+
+-- 15. CARE RECOMMENDATIONS (FELLOWSHIP CARE QUEUE)
+create table public.care_recommendations (
+  id uuid default gen_random_uuid() primary key,
+  member_id uuid references public.members(id) on delete cascade not null,
+  absence_count integer default 4,
+  last_attended_date timestamp with time zone,
+  status text default 'Pending', -- Pending, Contacted, Visited, Resolved, Ignored
+  pastoral_notes text,
+  campus text,
+  created_at timestamp with time zone default timezone('utc'::text, now())
+);
+
+alter table public.care_recommendations enable row level security;
+
+create policy "Pastors, Admins and Developers can view care recommendations."
+  on care_recommendations for select using (
+    get_my_role() in ('admin', 'developer', 'pastor')
+  );
+
+create policy "Pastors, Admins and Developers can manage care recommendations."
+  on care_recommendations for all using (
+    get_my_role() in ('admin', 'developer', 'pastor')
+  );
 
 

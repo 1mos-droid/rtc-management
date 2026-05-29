@@ -1,57 +1,97 @@
 :root {
-  font-family: 'Inter', system-ui, sans-serif;
-  line-height: 1.5;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  line-height: 1.6;
   font-weight: 400;
   color-scheme: light dark;
+
+  /* Vanguard HUD Token System - Radical Dark */
+  --bg-oled: #050505;
+  --bg-carbon: #0F0F11;
+  --accent-gold: #EAB308;
+  --accent-crimson: #8B1E31;
+  --hairline: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.04);
+  --text-vibrant: #F8F9FA;
+  --text-dim: #88888E;
+  
+  --fluid-curve: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 body {
   margin: 0;
-  min-height: 100vh;
-  position: relative;
+  padding: 0;
+  background-color: var(--bg-oled);
+  color: var(--text-vibrant);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  selection-background: rgba(234, 179, 8, 0.2);
+  selection-color: var(--accent-gold);
 }
 
-#root {
-  width: 100%;
-  min-height: 100vh;
+/* 🌌 Cinematic Background Globs */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: 
+    radial-gradient(at 0% 0%, rgba(139, 30, 49, 0.15) 0px, transparent 50%), 
+    radial-gradient(at 100% 100%, rgba(234, 179, 8, 0.05) 0px, transparent 50%);
+  z-index: -2;
+  pointer-events: none;
 }
 
-/* Minimal Scrollbar */
+/* 🎞️ Tactile Grain Overlay (Vanguard Polish) */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.035;
+  z-index: 10000;
+  pointer-events: none;
+}
+
+/* 🏎️ Hardware Motion Systems */
+@keyframes vanguardFadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.98);
+    filter: blur(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+.animate-vanguard {
+  animation: vanguardFadeUp 1.2s var(--fluid-curve) forwards;
+}
+
+/* Custom Scrollbar (Stealth Minimal) */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 4px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 10px;
 }
-[data-theme='dark'] ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
-}
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--accent-gold);
 }
 
-/* Modern Text utilities */
-.serif { font-family: 'Instrument Serif', serif; }
+/* Hide redundant UI elements from old project style */
+.double-border {
+    border: none !important;
+    outline: none !important;
+}
 
-/* Page Transitions */
-.fade-enter {
-  opacity: 0;
-}
-.fade-enter-active {
-  opacity: 1;
-  transition: opacity 300ms ease-out;
-}
-.fade-exit {
-  opacity: 1;
-}
-.fade-exit-active {
-  opacity: 0;
-  transition: opacity 300ms ease-in;
+.serif-title {
+    font-family: 'Cinzel', serif !important;
+    letter-spacing: 0.15em !important;
 }
